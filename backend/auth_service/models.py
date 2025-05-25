@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, EmailField
+from mongoengine import Document, StringField, EmailField, ReferenceField
 
 class User(Document):
     username = StringField(required=True, unique=True)
@@ -15,3 +15,12 @@ class User(Document):
     ])
     phone = StringField()
     address = StringField()
+
+class Doctor(Document):
+    user = StringField(required=True, unique=True)
+    specialty = StringField(default="")
+    department = StringField(default="")
+
+class Patient(Document):
+    user = StringField(required=True, unique=True)
+    medical_record_id = StringField(default="")

@@ -22,23 +22,30 @@ class RegisterView(APIView):
                 return Response({"error": "Username hoặc Email đã tồn tại!"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LoginView(APIView):
-    permission_classes = [AllowAny]
-
+class CustomLoginView(APIView):
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
         user = User.objects(username=username).first()
+
         if user and check_password(password, user.password):
             payload = {
-                "id": str(user.id),
+                "user_id": str(user.id),  # ✅ Đây là thứ SimpleJWT cần!
                 "username": user.username,
+                "role": user.role,
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
                 "iat": datetime.datetime.utcnow(),
             }
             token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+
             return Response({
                 "access": token,
-                "user": UserSerializer(user).data
+                "user": {
+                    "id": str(user.id),
+                    "username": user.username,
+                    "email": user.email,
+                    "role": user.role
+                }
             })
-        return Response({"error": "Thông tin đăng nhập không đúng!"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response({"error": "Sai tài khoản hoặc mật khẩu"}, status=status.HTTP_401_UNAUTHORIZED)

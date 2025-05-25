@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import Doctor, Patient, User
 from django.contrib.auth.hashers import make_password
 
 class UserSerializer(serializers.Serializer):
@@ -20,4 +20,9 @@ class RegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
-        return User(**validated_data).save()
+        user = User(**validated_data).save()
+        if validated_data['role'] == 'doctor':
+            Doctor(user=str(user.id)).save()
+        elif validated_data['role'] == 'patient':
+            Patient(user=str(user.id)).save()
+        return user

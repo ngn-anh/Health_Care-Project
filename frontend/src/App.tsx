@@ -2,7 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
-import DoctorDashboard from './pages/DoctorDashboard';
+import DoctorAppointmentPage from './pages/DoctorAppointmentPage';
+import DashboardLayout from './pages/DoctorDashboard';
+
 
 const App: React.FC = () => {
   return (
@@ -11,7 +13,13 @@ const App: React.FC = () => {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="/doctor" element={<DoctorDashboard />} />
+
+        {/* Doctor Dashboard Layout */}
+        <Route path="/doctor" element={<DashboardLayout />}>
+          <Route path="appointments" element={<DoctorAppointmentPage />} />
+          {/* Bạn có thể thêm các route khác tại đây như: */}
+          {/* <Route path="patients" element={<PatientHistory />} /> */}
+        </Route>
       </Routes>
     </Router>
   );

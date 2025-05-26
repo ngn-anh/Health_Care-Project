@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -54,7 +55,7 @@ class CustomLoginView(APIView):
 class UserDetailView(APIView):
     def get(self, request, id):
         user = User.objects(id=ObjectId(id)).first()
-        
+
         if not user:
             return Response({"error": "User not found"}, status=404)
         return Response({
@@ -63,3 +64,10 @@ class UserDetailView(APIView):
             "email": user.email,
             "role": user.role
         })
+    
+# View render giao diện HTML
+def login_view(request):
+    return render(request, 'login.html')
+
+def register_view(request):
+    return render(request, 'register.html')

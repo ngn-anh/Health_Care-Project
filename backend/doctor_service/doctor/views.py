@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import requests
@@ -145,3 +146,11 @@ class DoctorInfoView(APIView):
             return Response({"user_id": doctor.user})
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+        
+    
+# View render giao diện HTML
+def dashboard_view(request):
+    return render(request, 'doctor_dashboard.html')
+
+def appointment_view(request):
+    return render(request, 'doctor_appointment_page.html')

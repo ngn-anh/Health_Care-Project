@@ -5,6 +5,8 @@ from .views import (
     DoctorCreateView,
     DoctorInfoView,
     PatientListProxyView,
+    appointment_view,
+    dashboard_view,
 )
 from django.http import JsonResponse
 
@@ -18,5 +20,8 @@ urlpatterns = [
     path('patients/', PatientListProxyView.as_view()),
     path('create/', DoctorCreateView.as_view()),
     path("info/<str:id>/", DoctorInfoView.as_view()),
+    path("dashboard_view/", dashboard_view, name="dashboard_view"),
+    path("appointment_view/", appointment_view, name="appointment_view"),
+  
 
 ]

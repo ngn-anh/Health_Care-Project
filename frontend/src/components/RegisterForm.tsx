@@ -10,7 +10,9 @@ interface FormData {
   confirmPassword: string;
   role: string;
   phone: string;       
-  address: string;      
+  address: string;  
+  fullname: string;
+  gender: string;    
 }
 
 const RegisterForm: React.FC = () => {
@@ -22,6 +24,8 @@ const RegisterForm: React.FC = () => {
     role: 'patient',
     phone:'',
     address:'',
+    fullname: '',
+    gender: 'male',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -35,13 +39,15 @@ const RegisterForm: React.FC = () => {
     return;
   }
   try {
-    await axios.post("http://localhost:8000/api/auth/register/", {
+    await axios.post("http://localhost:7000/api/auth/register/", {
       username: formData.username,
       email: formData.email,
       password: formData.password,
       role: formData.role,
       phone: formData.phone,
       address: formData.address,
+      fullname: '',
+      gender: 'male',
     });
     alert("Đăng ký thành công! Chuyển sang đăng nhập...");
     window.location.href = "/login";

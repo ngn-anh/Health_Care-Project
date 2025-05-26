@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng ký</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center h-screen">
+  <form class="bg-white p-8 rounded-lg shadow-md w-full max-w-md" id="registerForm">
+    <h2 class="text-2xl font-bold mb-6 text-center text-green-600">📝 Đăng ký tài khoản</h2>
+    <div class="mb-4">
+      <label class="block mb-1">Tên người dùng</label>
+      <input type="text" name="username" class="w-full border px-3 py-2 rounded" required>
+    </div>
+    <div class="mb-4">
+      <label class="block mb-1">Email</label>
+      <input type="email" name="email" class="w-full border px-3 py-2 rounded" required>
+    </div>
+    <div class="mb-4">
+      <label class="block mb-1">Mật khẩu</label>
+      <input type="password" name="password" class="w-full border px-3 py-2 rounded" required>
+    </div>
+    <div class="mb-4">
+      <label class="block mb-1">Xác nhận mật khẩu</label>
+      <input type="password" name="password2" class="w-full border px-3 py-2 rounded" required>
+    </div>
+    <div class="mb-4">
+      <label class="block mb-1">Vai trò</label>
+      <select name="role" class="w-full border px-3 py-2 rounded">
+        <option value="patient">Bệnh nhân</option>
+        <option value="doctor">Bác sĩ</option>
+        <option value="nurse">Y tá</option>
+        <option value="admin">Admin</option>
+        <option value="pharmacist">Dược sĩ</option>
+        <option value="insurance">Nhân viên bảo hiểm</option>
+        <option value="lab">Kỹ thuật viên phòng Lab</option>
+      </select>
+    </div>
+    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Đăng ký</button>
+    <p id="registerMsg" class="text-center mt-4 text-red-600"></p>
+  </form>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        username: form.username.value,
+        email: form.email.value,
+        password: form.password.value,
+        password2: form.password2.value,
+        role: form.role.value
+      };
+      const res = await fetch('/api/auth/register/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      const msg = document.getElementById('registerMsg');
+      if (res.ok) {
+        msg.textContent = '✅ Đăng ký thành công!';
+        msg.className = 'text-green-600 text-center mt-4';
+      } else {
+        msg.textContent = '❌ Đăng ký thất bại: ' + (json.detail || JSON.stringify(json));
+      }
+    });
+  </script>
+</body>
+</html>

@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 from mongoengine import connect
 connect(
     db="SAD",  # tên database MongoDB
-    host="mongodb+srv://loan:21112003loanhoang@cluster0.1sdjxcz.mongodb.net/shoper?retryWrites=true&w=majority&appName=Cluster0",
+    host="mongodb+srv://loan:21112003loanhoang@cluster0.1sdjxcz.mongodb.net/SAD?retryWrites=true&w=majority&appName=Cluster0",
     username="loan",
     password="21112003loanhoang",
 )

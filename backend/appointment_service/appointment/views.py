@@ -7,7 +7,11 @@ from bson import ObjectId
 
 class AppointmentListCreateView(APIView):
     def get(self, request):
-        appointments = Appointment.objects()
+        doctor_id = request.GET.get("doctor")
+        if doctor_id:
+            appointments = Appointment.objects(doctor=doctor_id)
+        else:
+            appointments = Appointment.objects()
         data = AppointmentSerializer(appointments, many=True).data
         return Response(data)
 

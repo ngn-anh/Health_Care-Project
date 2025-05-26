@@ -12,7 +12,7 @@ class PatientListView(APIView):
             for p in patients:
                 user_info = {}
                 try:
-                    res = requests.get(f"http://localhost:7000/api/auth/user/{p.user}/")
+                    res = requests.get(f"http://localhost:7000/api/auth/users/{p.user}/")
                     if res.status_code == 200:
                         print(res)
                         user_info = res.json()

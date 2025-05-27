@@ -147,6 +147,72 @@ class DoctorInfoView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=500)
         
+
+class DoctorPatientListView(APIView):
+    def get(self, request):
+        try:
+            # Xác thực token
+            auth = request.headers.get("Authorization", "")
+            if not auth.startswith("Bearer "):
+                return Response({"error": "Missing or invalid token"}, status=401)
+
+            token = auth.split(" ")[1]
+            decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            user_id = decoded.get("user_id")
+
+            # Tìm bác sĩ theo user_id
+            doctor = Doctor.objects(user=user_id).first()
+            if not doctor:
+                return Response({"error": "Doctor not found"}, status=404)
+
+            doctor_id = str(doctor.id)
+
+            # Gọi sang appointment_service để lấy các lịch hẹn của bác sĩ này
+            res = requests.get("http://localhost:7001/api/appointments/", params={"doctor": doctor_id})
+            if res.status_code != 200:
+                return Response({"error": "Failed to fetch appointments", "detail": res.text}, status=res.status_code)
+
+            appointments = res.json()
+
+            # Lấy danh sách patient_id duy nhất
+            patient_ids = set()
+            for appt in appointments:
+                if "patient" in appt:
+                    patient = appt["patient"]
+                    if isinstance(patient, dict):
+                        patient_id = patient.get("id")
+                    else:
+                        patient_id = patient
+                    if patient_id:
+                        patient_ids.add(patient_id)
+
+            # Lấy thông tin từng bệnh nhân
+            patients_data = []
+            for patient_id in patient_ids:
+                try:
+                    info_res = requests.get(f"http://localhost:7003/api/patients/info/{patient_id}/")
+                    if info_res.status_code != 200:
+                        continue
+                    user_id = info_res.json().get("user_id")
+
+                    user_res = requests.get(f"http://localhost:7000/api/auth/users/{user_id}/")
+                    if user_res.status_code != 200:
+                        continue
+                    user_info = user_res.json()
+                    user_info["id"] = patient_id
+                    patients_data.append(user_info)
+                except Exception:
+                    continue
+
+            return Response(patients_data, status=200)
+
+        except jwt.ExpiredSignatureError:
+            return Response({"error": "Token expired"}, status=401)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
+        
+
     
 # View render giao diện HTML
 def dashboard_view(request):
@@ -154,3 +220,6 @@ def dashboard_view(request):
 
 def appointment_view(request):
     return render(request, 'doctor_appointment_page.html')
+
+def list_patient_view(request):
+    return render(request, 'doctor_list_patient.html')

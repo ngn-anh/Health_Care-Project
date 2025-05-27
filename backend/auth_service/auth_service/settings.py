@@ -38,8 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user',
-    'rest_framework',
+    'user'
 ]
 
 MIDDLEWARE = [
@@ -58,7 +57,6 @@ ROOT_URLCONF = 'auth_service.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # 'DIRS': [],
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -136,9 +134,9 @@ connect(
     password="21112003loanhoang",
 )
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:7000",
+# ]
 
 REST_FRAMEWORK = {
     # 'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -146,8 +144,10 @@ REST_FRAMEWORK = {
     # )
 }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.dummy'
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.dummy'
+#     }
+# }
+
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"

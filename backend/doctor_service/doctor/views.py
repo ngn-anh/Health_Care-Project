@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import requests
@@ -6,6 +7,8 @@ from django.conf import settings
 from bson import ObjectId
 from doctor.models import Doctor
 
+from mongoengine.errors import DoesNotExist
+from .serializers import DoctorSerializer
 
 
 APPOINTMENT_BASE = "http://localhost:7001/api/appointments/"
@@ -143,5 +146,95 @@ class DoctorInfoView(APIView):
             if not doctor:
                 return Response({"error": "Doctor not found"}, status=404)
             return Response({"user_id": doctor.user})
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+        
+    
+# View render giao diện HTML
+def dashboard_view(request):
+    return render(request, 'doctor_dashboard.html')
+
+def appointment_view(request):
+    return render(request, 'doctor_appointment_page.html')
+
+USER_URL = "http://localhost:7000/api/auth/users"
+
+class DoctorAllListView(APIView):
+    def get(self, request):
+        try:
+            doctors = Doctor.objects()  # Lấy tất cả bác sĩ
+            result = []
+
+            for doc in doctors:
+                # Chuyển Doctor Document → dict
+                doc_dict = doc.to_mongo().to_dict()
+                # Convert các ObjectId sang string
+                doc_dict["_id"] = str(doc_dict["_id"])
+                if isinstance(doc_dict.get("user"), ObjectId):
+                    user_id = str(doc_dict["user"])
+                else:
+                    user_id = doc_dict.get("user")
+
+                # Gọi API lấy chi tiết user
+                try:
+                    user_res = requests.get(f"{USER_URL}/{user_id}")
+                    if user_res.status_code == 200:
+                        user_data = user_res.json()
+                    else:
+                        user_data = {"error": "User not found"}
+                except Exception:
+                    user_data = {"error": "Cannot fetch user"}
+
+                # Ghi đè trường user
+                doc_dict["user"] = user_data
+                result.append(doc_dict)
+
+            return Response(result, status=200)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
+class DoctorInforView(APIView):
+    def get(self, request):
+        try:
+            user_id = request.query_params.get("user")
+            res = requests.get(f"{USER_URL}/{user_id}")
+
+            if res.status_code == 200:
+                user_data = res.json()
+                doctor = Doctor.objects.get(user=user_id)
+                doctor_dict = doctor.to_mongo().to_dict()
+                doctor_dict["_id"] = str(doctor_dict["_id"])  # Convert ObjectId to string
+                serializer = DoctorSerializer(doctor_dict)
+                doctor_data = serializer.data
+                doctor_data["user"] = user_data  # Gán object user vào trường user trong kết quả trả về
+
+                return Response(doctor_data, status=200)
+            else:
+                return Response({"error": "User not found"}, status=404)
+        except DoesNotExist:
+            return Response({"error": "Không tìm thấy bác sĩ"}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
+class DoctorInforByIdView(APIView):
+    def get(self, request, id):
+        try:
+            doctor = Doctor.objects(id=ObjectId(id)).first()
+            serializer = DoctorSerializer(doctor)
+            doctor_data = serializer.data
+            user_id = doctor_data["user"]
+            res = requests.get(f"{USER_URL}/{user_id}")
+
+            if res.status_code == 200:
+                user_data = res.json()
+                
+                doctor_data["user"] = user_data  # Gán object user vào trường user trong kết quả trả về
+
+                return Response(doctor_data, status=200)
+            else:
+                return Response({"error": "User not found"}, status=404)
+        except DoesNotExist:
+            return Response({"error": "Không tìm thấy bác sĩ"}, status=404)
         except Exception as e:
             return Response({"error": str(e)}, status=500)

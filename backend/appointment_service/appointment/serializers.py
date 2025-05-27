@@ -34,11 +34,13 @@ class AppointmentSerializer(serializers.Serializer):
     def get_patient(self, obj):
         try:
             patient_id = obj.patient
-            # Bước 1: Lấy user_id từ patient_service
             res = requests.get(f"http://localhost:7003/api/patients/info/{patient_id}/")
             if res.status_code == 200:
-                user_id = res.json().get("user_id")
-                return self.get_user_info(user_id)
+                user_data = res.json()
+                user_id = user_data.get("user_id")
+                user_info = self.get_user_info(user_id) or {}
+                user_info["id"] = patient_id  # Thêm ID bệnh nhân vào kết quả
+                return user_info
         except Exception:
             pass
         return None

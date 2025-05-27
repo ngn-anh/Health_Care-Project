@@ -50,7 +50,7 @@
                 type="radio"
                 name="gender"
                 id="male"
-                value="Nam"
+                value="male"
               />
               <label class="form-check-label" for="male">Nam</label>
             </div>
@@ -60,9 +60,19 @@
                 type="radio"
                 name="gender"
                 id="female"
-                value="Nữ"
+                value="female"
               />
               <label class="form-check-label" for="female">Nữ</label>
+            </div>
+            <div class="form-check form-check-inline mb-0">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="gender"
+                id="other"
+                value="other"
+              />
+              <label class="form-check-label" for="other">Khác</label>
             </div>
           </div>
 
@@ -92,75 +102,107 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- JavaScript logic -->
+
     <script>
-      const user = localStorage.getItem("user");
+      // Hàm load và render patient từ localStorage
+      function loadPatientFromStorage() {
+        const patientStr = localStorage.getItem("patient");
+        if (!patientStr) {
+          alert(
+            "Không tìm thấy thông tin bệnh nhân trong bộ nhớ. Vui lòng đăng nhập lại."
+          );
+          window.location.href = "http://localhost:7000/api/auth/login_view/";
+          return null;
+        }
+        try {
+          const patient = JSON.parse(patientStr);
+          console.log(">>>>", patient);
+          // Đổ dữ liệu vào form
+          document.getElementById("fullname").value =
+            patient.user.fullname || "";
+          document.getElementById("email").value = patient.user.email || "";
+          document.getElementById("phone").value = patient.user.phone || "";
+          document.getElementById("address").value = patient.user.address || "";
 
-      if (!user) {
-        alert("Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.");
-        window.location.href = "http://localhost:7000/api/auth/login_view/";
+          if (patient.user.gender === "male") {
+            document.getElementById("male").checked = true;
+          } else if (patient.user.gender === "female") {
+            document.getElementById("female").checked = true;
+          } else if (patient.user.gender === "other") {
+            document.getElementById("other").checked = true;
+          }
+          return patient;
+        } catch (error) {
+          console.error(
+            "Lỗi khi phân tích dữ liệu bệnh nhân từ localStorage:",
+            error
+          );
+          alert("Dữ liệu bệnh nhân không hợp lệ. Vui lòng đăng nhập lại.");
+          window.location.href = "http://localhost:7000/api/auth/login_view/";
+          return null;
+        }
       }
-      // Lấy thông tin ban đầu
-      window.addEventListener("DOMContentLoaded", () => {
-        fetch(`http://localhost:8001/api/patients/getInfor/${user.id}`)
-          .then((res) => res.json())
-          .then((data) => {
-            document.getElementById("username").value = data.username || "";
-            document.getElementById("email").value = data.email || "";
-            document.getElementById("fullname").value = data.fullname || "";
-            document.getElementById("birth").value = data.birth
-              ? new Date(data.birth).toISOString().split("T")[0]
-              : "";
-            document.getElementById("phone").value = data.phone || "";
-            document.getElementById("address").value = data.address || "";
 
-            if (data.gender === "Nam") {
-              document.getElementById("male").checked = true;
-            } else if (data.gender === "Nữ") {
-              document.getElementById("female").checked = true;
-            }
-          })
-          .catch((err) => console.error("Lỗi lấy thông tin:", err));
-      });
+      // Khi trang load, đổ thông tin patient vào form
+      const currentPatient = loadPatientFromStorage();
 
-      // Cập nhật thông tin
+      // Xử lý submit form cập nhật
       document
         .getElementById("updatePatientForm")
-        .addEventListener("submit", function (e) {
+        .addEventListener("submit", async function (e) {
           e.preventDefault();
+          if (!currentPatient) return;
 
           const updatedData = {
-            email: document.getElementById("email").value,
+            user: currentPatient.user.id,
             fullname: document.getElementById("fullname").value,
-            birth: document.getElementById("birth").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value,
             gender: document.querySelector('input[name="gender"]:checked')
               ?.value,
-            phone: document.getElementById("phone").value,
             address: document.getElementById("address").value,
           };
 
-          fetch(`http://localhost:8001/patient/updateInfor/${userId}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(updatedData),
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              alert("Cập nhật thành công!");
-            })
-            .catch((err) => {
-              alert("Có lỗi xảy ra!");
-              console.error(err);
-            });
+          try {
+            const response = await fetch(
+              "http://127.0.0.1:7003/api/patients/updateInfor",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedData),
+              }
+            );
+
+            if (!response.ok) {
+              const err = await response.json();
+              throw new Error(err.error || "Cập nhật thất bại");
+            }
+
+            // 1) Đọc về patient mới
+            const updatedPatient = await response.json();
+
+            // 2) Lưu lại vào localStorage
+            localStorage.setItem("patient", JSON.stringify(updatedPatient));
+
+            // 3) (Tùy chọn) Cập nhật lại form ngay lập tức
+            loadPatientFromStorage();
+
+            alert("Cập nhật thông tin thành công!");
+          } catch (err) {
+            console.error("Lỗi khi cập nhật:", err);
+            alert("Có lỗi xảy ra khi cập nhật: " + err.message);
+          }
         });
 
       // Đăng xuất
       function logout() {
-        // Clear session/localStorage nếu có
+        localStorage.removeItem("accessToken");
         localStorage.removeItem("userId");
-        alert("Đã đăng xuất");
-        window.location.href = "/login"; // 👉 Chuyển về trang đăng nhập
+        localStorage.removeItem("username");
+        localStorage.removeItem("patient");
+        window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
       }
     </script>
   </body>

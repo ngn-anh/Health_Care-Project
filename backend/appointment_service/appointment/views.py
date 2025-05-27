@@ -4,10 +4,18 @@ from rest_framework import status
 from .models import Appointment
 from .serializers import AppointmentSerializer
 from bson import ObjectId
+import requests
+
+DOCTOR_URL = "http://localhost:7002/api/doctor"
+PATIENT_URL = "http://localhost:7003/api/patients"
 
 class AppointmentListCreateView(APIView):
     def get(self, request):
-        appointments = Appointment.objects()
+        doctor_id = request.GET.get("doctor")
+        if doctor_id:
+            appointments = Appointment.objects(doctor=doctor_id)
+        else:
+            appointments = Appointment.objects()
         data = AppointmentSerializer(appointments, many=True).data
         return Response(data)
 
@@ -52,3 +60,55 @@ class AppointmentDetailView(APIView):
             return Response({"error": "Not found"}, status=404)
         appointment.delete()
         return Response(status=204)
+
+class AppointmentListView(APIView):
+    def get(self, request):
+        patient_id = request.query_params.get('patient')
+        if not patient_id:
+            return Response({"error": "patientId is required"}, status=400)
+
+        try:
+            # 1. Lấy danh sách appointment thô
+            appointments = Appointment.objects(patient=patient_id)
+
+            # 2. Chuẩn bị list kết quả
+            result = []
+            for appt in appointments:
+                # 2.1 chuyển mỗi appt sang dict và convert ObjectId sang string
+                appt_dict = appt.to_mongo().to_dict()
+                appt_dict["_id"] = str(appt_dict["_id"])
+                # giữ lại doctor/patient id trước khi overwrite
+                doctor_id = str(appt_dict.get("doctor"))
+                # patient_id = str(appt_dict.get("patient"))
+                # print(" doctor_id", doctor_id)
+                # print ("api: ", f"{DOCTOR_URL}/getInforById/{doctor_id}")
+                # 2.2 gọi API lấy chi tiết doctor
+                try:
+                    dr_res = requests.get(f"{DOCTOR_URL}/getInforById/{doctor_id}")
+                    print("dr_res: ", dr_res.status_code)
+                    if dr_res.status_code == 200:
+                        appt_dict["doctor"] = dr_res.json()
+                    else:
+                        appt_dict["doctor"] = {"error": "Doctor not found"}
+                except Exception:
+                    appt_dict["doctor"] = {"error": "Cannot fetch doctor info"}
+
+                # # 2.3 gọi API lấy chi tiết patient
+                # try:
+                #     pt_res = requests.get(f"{PATIENT_URL}/getInforById/{patient_id}")
+                #     if pt_res.status_code == 200:
+                #         appt_dict["patient"] = pt_res.json()
+                #     else:
+                #         appt_dict["patient"] = {"error": "Patient not found"}
+                # except Exception:
+                #     appt_dict["patient"] = {"error": "Cannot fetch patient info"}
+
+                result.append(appt_dict)
+
+            return Response(result, status=200)
+
+        except DoesNotExist:
+            return Response({"error": "Không tìm thấy lịch hẹn"}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+    

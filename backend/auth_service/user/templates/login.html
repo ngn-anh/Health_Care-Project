@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Đăng nhập</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <form
+      onsubmit="handleLogin(event)"
+      class="bg-white p-8 rounded shadow-md w-full max-w-sm"
+    >
+      <h2 class="text-2xl font-bold text-blue-600 mb-6 flex items-center gap-2">
+        🔒 Đăng nhập
+      </h2>
+
+      <input
+        id="username"
+        type="text"
+        placeholder="Tên đăng nhập"
+        class="w-full border border-gray-300 p-2 rounded mb-4"
+        required
+      />
+      <input
+        id="password"
+        type="password"
+        placeholder="Mật khẩu"
+        class="w-full border border-gray-300 p-2 rounded mb-4"
+        required
+      />
+
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+      >
+        Đăng nhập
+      </button>
+
+      <p class="text-sm mt-4 text-center">
+        Chưa có tài khoản?
+        <a
+          href="http://127.0.0.1:7000/api/auth/register_view/"
+          class="text-blue-600 hover:underline"
+          >Đăng ký</a
+        >
+      </p>
+    </form>
+
+    <script>
+      async function handleLogin(event) {
+        event.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        try {
+          const res = await fetch("/api/auth/login/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Đăng nhập thất bại");
+
+          localStorage.setItem("accessToken", data.access);
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          alert("Đăng nhập thành công!");
+
+          const role = data.user.role;
+          if (role === "doctor") {
+            window.location.href = `http://127.0.0.1:7002/api/doctor/dashboard_view?token=${data.access}&username=${data.user.username}`;
+          } else if (role === "patient") {
+            window.location.href = `http://127.0.0.1:7003/api/patients/home_view?token=${data.access}&userId=${data.user.id}&username=${data.user.username}`;
+          } else {
+            window.location.href = "/";
+          }
+        } catch (err) {
+          alert(err.message);
+        }
+      }
+    </script>
+  </body>
+</html>

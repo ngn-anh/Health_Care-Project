@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,7 +10,6 @@ import jwt, datetime
 from django.conf import settings
 from mongoengine.errors import NotUniqueError
 from bson import ObjectId
-from django.shortcuts import render
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -55,16 +55,48 @@ class CustomLoginView(APIView):
 class UserDetailView(APIView):
     def get(self, request, id):
         user = User.objects(id=ObjectId(id)).first()
-        
+        serializer = UserSerializer(user)
+
         if not user:
             return Response({"error": "User not found"}, status=404)
-        return Response({
-            "id": str(user.id),
-            "username": user.username,
-            "email": user.email,
-            "role": user.role
-        })
+        return Response(serializer.data, status=200)
 
+class UserUpdateView(APIView):
+    def post(self, request, id):
+        user = User.objects(id=ObjectId(id)).first()
+        if not user:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data
+
+        new_email = data.get("email")
+        if new_email and new_email != user.email:
+            if User.objects(email=new_email).first():
+                return Response(
+                    {"error": "Email already in use by another user."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        update_fields = {
+            "set__fullname": data.get("fullname", user.fullname),
+            "set__email": new_email or user.email,
+            "set__phone": data.get("phone", user.phone),
+            "set__gender": data.get("gender", user.gender),
+            "set__address": data.get("address", user.address)
+        }
+
+        # Gọi update
+        User.objects(id=ObjectId(id)).update(**update_fields)
+
+        # Lấy lại user đã cập nhật để serialize
+        updated_user = User.objects(id=ObjectId(id)).first()
+        serializer = UserSerializer(updated_user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
 # View render giao diện HTML
 def login_view(request):
-    return render(request, 'auth_user/login.html')
+    return render(request, 'login.html')
+
+def register_view(request):
+    return render(request, 'register.html')

@@ -6,7 +6,7 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'patient_service.settings')
-    default_port = '8001'
+    default_port = '7003'
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

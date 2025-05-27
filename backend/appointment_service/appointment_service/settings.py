@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'appointment',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -133,9 +134,9 @@ connect(
     password="21112003loanhoang",
 )
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",
+# ]
 
 REST_FRAMEWORK = {
     # 'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -148,3 +149,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.dummy'
     }
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:7003",
+    "http://localhost:7003",
+]

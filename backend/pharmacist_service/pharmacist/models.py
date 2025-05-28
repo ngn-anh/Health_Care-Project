@@ -1,4 +1,5 @@
 from django.db import models
+from mongoengine import Document, StringField, ObjectIdField, DateTimeField
 
 class Pharmacist(models.Model):
     user_id = models.CharField(max_length=100, unique=True)  # Liên kết với User từ auth_service
@@ -13,6 +14,16 @@ class Medication(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Diagnosis(Document):
+    id = ObjectIdField(primary_key=True)
+    diagnosis = StringField(required=True)
+    prescription = StringField()  # Thêm nếu cần
+    symptoms = StringField()     # Thêm nếu cần
+    doctor_id = StringField()    # Thêm nếu cần
+    patient_id = StringField()   # Thêm nếu cần
+    created_at = DateTimeField() # Thêm nếu cần
+    meta = {'collection': 'diagnosis'}
 
 class Prescription(models.Model):
     patient_id = models.CharField(max_length=100)

@@ -1,0 +1,17 @@
+DISEASE_TO_MEDICATION = {
+    'cold': ['paracetamol', 'ibuprofen', 'decongestant'],
+    'flu': ['paracetamol', 'antiviral', 'ibuprofen'],
+    'diabetes': ['metformin', 'insulin'],
+    'pneumonia': ['antibiotics', 'amoxicillin'],
+    'gastritis': ['antacid', 'omeprazole'],
+    'covid-19': ['paracetamol', 'antiviral'],
+    'hypertension': ['lisinopril', 'amlodipine'],
+    'migraine': ['ibuprofen', 'sumatriptan'],
+    'hepatitis': ['antiviral', 'hepatoprotective'],
+    'asthma': ['inhaler', 'salbutamol'],
+    'bronchitis': ['antibiotics', 'mucolytic'],
+    'tuberculosis': ['antibiotics', 'rifampicin'],
+    'dengue': ['paracetamol'],
+    'malaria': ['antimalarial', 'chloroquine'],
+    'anemia': ['iron supplement', 'folic acid'],
+}

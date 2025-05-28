@@ -1,0 +1,268 @@
+{
+  "diseases": {
+    "Common_Cold": {
+      "name": "Common Cold",
+      "description": "A viral infection of the upper respiratory tract",
+      "common_symptoms": [
+        "Runny Nose",
+        "Sneezing",
+        "Cough",
+        "Sore Throat",
+        "Mild Fatigue"
+      ],
+      "severity": "mild",
+      "recommended_tests": ["Clinical examination", "Throat swab if severe"],
+      "treatments": ["Rest", "Fluids", "Paracetamol", "Throat lozenges"],
+      "prevention": ["Hand washing", "Avoid close contact", "Healthy diet"],
+      "when_to_see_doctor": "If symptoms persist >10 days or worsen",
+      "contagious": true,
+      "duration": "7-10 days"
+    },
+    "Influenza": {
+      "name": "Influenza (Flu)",
+      "description": "A viral infection affecting the respiratory system",
+      "common_symptoms": [
+        "Fever",
+        "Cough",
+        "Body Aches",
+        "Fatigue",
+        "Headache",
+        "Chills"
+      ],
+      "severity": "moderate",
+      "recommended_tests": ["Rapid flu test", "RT-PCR", "Throat swab"],
+      "treatments": ["Oseltamivir (Tamiflu)", "Rest", "Fluids", "Paracetamol"],
+      "prevention": ["Annual flu vaccine", "Hand hygiene", "Avoid crowds"],
+      "when_to_see_doctor": "High fever >39°C, difficulty breathing",
+      "contagious": true,
+      "duration": "5-7 days"
+    },
+    "COVID19": {
+      "name": "COVID-19",
+      "description": "Disease caused by SARS-CoV-2 coronavirus",
+      "common_symptoms": [
+        "Fever",
+        "Cough",
+        "Loss of Taste",
+        "Loss of Smell",
+        "Fatigue",
+        "Shortness of Breath"
+      ],
+      "severity": "moderate",
+      "recommended_tests": ["RT-PCR test", "Rapid antigen test", "Chest X-ray"],
+      "treatments": [
+        "Isolation",
+        "Paracetamol",
+        "Rest",
+        "Monitor oxygen levels"
+      ],
+      "prevention": [
+        "Vaccination",
+        "Mask wearing",
+        "Social distancing",
+        "Hand hygiene"
+      ],
+      "when_to_see_doctor": "Difficulty breathing, chest pain, oxygen <95%",
+      "contagious": true,
+      "duration": "10-14 days"
+    },
+    "Allergic_Rhinitis": {
+      "name": "Allergic Rhinitis",
+      "description": "Allergic reaction causing nasal inflammation",
+      "common_symptoms": [
+        "Runny Nose",
+        "Sneezing",
+        "Itchy Eyes",
+        "Nasal Congestion",
+        "Watery Eyes"
+      ],
+      "severity": "mild",
+      "recommended_tests": [
+        "Allergy skin test",
+        "IgE blood test",
+        "Nasal endoscopy"
+      ],
+      "treatments": [
+        "Antihistamines",
+        "Nasal corticosteroids",
+        "Avoid allergens"
+      ],
+      "prevention": [
+        "Identify and avoid triggers",
+        "Air purifiers",
+        "Regular cleaning"
+      ],
+      "when_to_see_doctor": "Severe symptoms affecting daily life",
+      "contagious": false,
+      "duration": "Seasonal or chronic"
+    },
+    "Bronchitis": {
+      "name": "Bronchitis",
+      "description": "Inflammation of the bronchial tubes",
+      "common_symptoms": [
+        "Persistent Cough",
+        "Mucus Production",
+        "Fatigue",
+        "Shortness of Breath",
+        "Chest Discomfort"
+      ],
+      "severity": "moderate",
+      "recommended_tests": [
+        "Chest X-ray",
+        "Sputum test",
+        "Pulmonary function test"
+      ],
+      "treatments": [
+        "Bronchodilators",
+        "Cough suppressants",
+        "Antibiotics if bacterial"
+      ],
+      "prevention": ["Avoid smoking", "Hand hygiene", "Avoid air pollution"],
+      "when_to_see_doctor": "Cough with blood, high fever, breathing difficulty",
+      "contagious": false,
+      "duration": "2-3 weeks"
+    },
+    "Pneumonia": {
+      "name": "Pneumonia",
+      "description": "Infection causing inflammation in lung air sacs",
+      "common_symptoms": [
+        "High Fever",
+        "Persistent Cough",
+        "Shortness of Breath",
+        "Chest Pain",
+        "Fatigue",
+        "Chills"
+      ],
+      "severity": "severe",
+      "recommended_tests": [
+        "Chest X-ray",
+        "Blood tests",
+        "Sputum culture",
+        "CT scan"
+      ],
+      "treatments": [
+        "Antibiotics",
+        "Rest",
+        "Oxygen therapy",
+        "Hospitalization if severe"
+      ],
+      "prevention": ["Pneumonia vaccine", "Hand hygiene", "Healthy lifestyle"],
+      "when_to_see_doctor": "Immediate medical attention required",
+      "contagious": true,
+      "duration": "1-3 weeks with treatment"
+    },
+    "Asthma": {
+      "name": "Asthma",
+      "description": "Chronic respiratory condition with airway inflammation",
+      "common_symptoms": [
+        "Wheezing",
+        "Shortness of Breath",
+        "Chest Tightness",
+        "Persistent Cough"
+      ],
+      "severity": "moderate",
+      "recommended_tests": [
+        "Spirometry",
+        "Peak flow test",
+        "Chest X-ray",
+        "Allergy tests"
+      ],
+      "treatments": [
+        "Inhaled corticosteroids",
+        "Bronchodilators",
+        "Avoid triggers"
+      ],
+      "prevention": [
+        "Identify triggers",
+        "Take medications as prescribed",
+        "Regular monitoring"
+      ],
+      "when_to_see_doctor": "Severe breathing difficulty, blue lips/face",
+      "contagious": false,
+      "duration": "Chronic condition"
+    },
+    "Sinusitis": {
+      "name": "Sinusitis",
+      "description": "Inflammation of the sinuses",
+      "common_symptoms": [
+        "Facial Pain",
+        "Nasal Congestion",
+        "Thick Nasal Discharge",
+        "Headache",
+        "Loss of Smell"
+      ],
+      "severity": "mild",
+      "recommended_tests": [
+        "Clinical examination",
+        "CT scan",
+        "Nasal endoscopy"
+      ],
+      "treatments": [
+        "Nasal decongestants",
+        "Saline rinses",
+        "Antibiotics if bacterial"
+      ],
+      "prevention": ["Humidify air", "Avoid allergens", "Hand hygiene"],
+      "when_to_see_doctor": "Symptoms persist >10 days, severe headache",
+      "contagious": false,
+      "duration": "1-2 weeks"
+    },
+    "Migraine": {
+      "name": "Migraine",
+      "description": "Neurological condition causing severe headaches",
+      "common_symptoms": [
+        "Severe Headache",
+        "Nausea",
+        "Light Sensitivity",
+        "Sound Sensitivity",
+        "Vomiting"
+      ],
+      "severity": "moderate",
+      "recommended_tests": [
+        "Neurological exam",
+        "MRI",
+        "CT scan",
+        "Blood tests"
+      ],
+      "treatments": [
+        "Pain relievers",
+        "Triptans",
+        "Anti-nausea medications",
+        "Preventive medications"
+      ],
+      "prevention": [
+        "Identify triggers",
+        "Regular sleep",
+        "Stress management",
+        "Stay hydrated"
+      ],
+      "when_to_see_doctor": "Sudden severe headache, neurological symptoms",
+      "contagious": false,
+      "duration": "4-72 hours per episode"
+    },
+    "Food_Poisoning": {
+      "name": "Food Poisoning",
+      "description": "Illness from consuming contaminated food",
+      "common_symptoms": [
+        "Nausea",
+        "Vomiting",
+        "Diarrhea",
+        "Abdominal Pain",
+        "Fever",
+        "Fatigue"
+      ],
+      "severity": "mild",
+      "recommended_tests": ["Stool culture", "Blood tests if severe"],
+      "treatments": ["Fluids", "Electrolyte replacement", "Rest", "Bland diet"],
+      "prevention": [
+        "Food safety",
+        "Proper cooking",
+        "Hand hygiene",
+        "Safe water"
+      ],
+      "when_to_see_doctor": "Severe dehydration, high fever, blood in stool",
+      "contagious": false,
+      "duration": "1-7 days"
+    }
+  }
+}

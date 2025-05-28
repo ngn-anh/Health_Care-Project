@@ -24,6 +24,19 @@ services:
       - "7003:7003"
     networks:
       - micro_net
+  pharmacist_service:
+    build: ./pharmacist_service
+    ports:
+      - "7005:7005"
+    networks:
+      - micro_net
+
+  chatbot_tdque:
+    build: ./chatbot_tdque
+    ports:
+      - "8004:8004"
+    networks:
+      - micro_net
 
 networks:
   micro_net:

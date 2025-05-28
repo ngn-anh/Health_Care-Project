@@ -72,6 +72,8 @@
             window.location.href = `http://127.0.0.1:7002/api/doctor/dashboard_view?token=${data.access}&username=${data.user.username}`;
           } else if (role === "patient") {
             window.location.href = `http://127.0.0.1:7003/api/patients/home_view?token=${data.access}&userId=${data.user.id}&username=${data.user.username}`;
+          } else if (role === "pharmacist") {
+            window.location.href = `http://127.0.0.1:7005/api/pharmacist/dashboard/?token=${data.access}`;
           } else {
             window.location.href = "/";
           }

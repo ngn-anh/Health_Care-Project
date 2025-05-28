@@ -1,0 +1,55 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Health Assistant</title>
+  </head>
+  <body>
+    <h2>Nhập triệu chứng (Y/N):</h2>
+    <form id="symptomForm">
+      <label>Fever: <input type="checkbox" name="symptom" value="0" /></label
+      ><br />
+      <label>Cough: <input type="checkbox" name="symptom" value="1" /></label
+      ><br />
+      <label>Sneezing: <input type="checkbox" name="symptom" value="2" /></label
+      ><br />
+      <label>Fatigue: <input type="checkbox" name="symptom" value="3" /></label
+      ><br />
+      <label
+        >Loss of Taste:
+        <input type="checkbox" name="symptom" value="4" /></label
+      ><br />
+      <label
+        >Itchy Eyes: <input type="checkbox" name="symptom" value="5" /></label
+      ><br />
+      <button type="submit">Chẩn đoán</button>
+    </form>
+    <div id="result"></div>
+    <script>
+      document.getElementById("symptomForm").onsubmit = async function (e) {
+        e.preventDefault();
+        let symptoms = Array(6).fill(0);
+        document.querySelectorAll("input[type=checkbox]").forEach((cb, idx) => {
+          if (cb.checked) symptoms[idx] = 1;
+        });
+        let res = await fetch("http://127.0.0.1:5000/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ symptoms }),
+        });
+        let data = await res.json();
+        let resultText = `Chẩn đoán: ${
+          data.diagnosis
+        }\nXác suất: ${data.probabilities.map((p) => p.toFixed(2)).join(", ")}`;
+        document.getElementById("result").innerText = resultText;
+        // Thêm chức năng nói
+        if ("speechSynthesis" in window) {
+          let msg = new SpeechSynthesisUtterance(
+            `You may have ${data.diagnosis}, please see a doctor!`
+          );
+          window.speechSynthesis.speak(msg);
+        }
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý kho thuốc</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <div class="bg-blue-800 text-white w-64 space-y-6 py-7 px-2">
+      <h2 class="text-2xl font-bold text-center">Dược sĩ</h2>
+      <nav>
+        <a href="{% url 'dashboard_view' %}" id="dashboardLink" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">Tổng quan</a>
+        <a href="{% url 'verify_view' %}" id="verifyLink" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">Xác minh đơn thuốc</a>
+        <a href="{% url 'inventory_view' %}" id="inventoryLink" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">Quản lý kho thuốc</a>
+      </nav>
+    </div>
+
+    <div class="flex-1 p-10">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Quản lý kho thuốc</h1>
+        <button id="logoutButton" class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-200">
+          Đăng xuất
+        </button>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Thêm thuốc mới</h3>
+        <form id="addMedicationForm" class="space-y-4">
+          <input type="text" id="medicationName" placeholder="Tên thuốc" class="w-full border border-gray-300 p-2 rounded">
+          <input type="number" id="medicationQuantity" placeholder="Số lượng" class="w-full border border-gray-300 p-2 rounded" min="0">
+          <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">Thêm</button>
+        </form>
+        <p id="addError" class="text-red-500 text-sm mt-2 hidden"></p>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Danh sách thuốc</h3>
+        <table id="medicationTable" class="w-full text-left">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="p-2">Tên thuốc</th>
+              <th class="p-2">Số lượng</th>
+              <th class="p-2">Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="medicationList"></tbody>
+        </table>
+        <p id="fetchError" class="text-red-500 text-sm mt-2 hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Lấy token từ URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
+
+    // Lấy token từ localStorage
+    let token = localStorage.getItem("accessToken");
+
+    // Nếu token từ query parameter tồn tại, lưu vào localStorage
+    if (tokenFromUrl) {
+      token = tokenFromUrl;
+      localStorage.setItem("accessToken", token);
+    }
+
+    // Gỡ lỗi: In token để kiểm tra
+    console.log("Token from URL:", tokenFromUrl);
+    console.log("Token used:", token);
+
+    // Kiểm tra token trước khi thực hiện các yêu cầu API
+    if (!token) {
+      alert("Không tìm thấy token. Vui lòng đăng nhập lại.");
+      window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+    }
+
+    // Cập nhật URL của tất cả liên kết với token
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        const links = document.querySelectorAll("nav a");
+        links.forEach(link => {
+          if (token) {
+            const url = new URL(link.href);
+            url.searchParams.set('token', token);
+            link.href = url.toString();
+            console.log("Updated link URL:", link.href); // Gỡ lỗi: In URL đã cập nhật
+          } else {
+            console.log("No token available, redirecting...");
+            window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+          }
+        });
+      });
+    } else {
+      const links = document.querySelectorAll("nav a");
+      links.forEach(link => {
+        if (token) {
+          const url = new URL(link.href);
+          url.searchParams.set('token', token);
+          link.href = url.toString();
+          console.log("Updated link URL:", link.href); // Gỡ lỗi: In URL đã cập nhật
+        } else {
+          console.log("No token available, redirecting...");
+          window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+        }
+      });
+    }
+
+    // Lấy danh sách thuốc
+    async function fetchMedications() {
+      try {
+        const response = await fetch("http://127.0.0.1:7005/api/pharmacist/inventory/", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.status === 401) {
+          alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("user");
+          window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+          return;
+        }
+        const data = await response.json();
+        if (response.ok) {
+          const medications = data;
+          const tbody = document.getElementById("medicationList");
+          tbody.innerHTML = "";
+          medications.forEach(med => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td class="p-2">${med.name}</td>
+              <td class="p-2">${med.quantity}</td>
+              <td class="p-2">
+                <button onclick="updateMedication(${med.id}, ${med.quantity})" class="bg-yellow-600 text-white py-1 px-2 rounded hover:bg-yellow-700 mr-2">Cập nhật</button>
+                <button onclick="deleteMedication(${med.id})" class="bg-red-600 text-white py-1 px-2 rounded hover:bg-red-700">Xóa</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        } else {
+          document.getElementById("fetchError").textContent = "Lỗi khi lấy danh sách thuốc.";
+          document.getElementById("fetchError").classList.remove("hidden");
+        }
+      } catch (err) {
+        document.getElementById("fetchError").textContent = `Lỗi: ${err.message}`;
+        document.getElementById("fetchError").classList.remove("hidden");
+      }
+    }
+
+    // Thêm thuốc
+    document.getElementById("addMedicationForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+      const name = document.getElementById("medicationName").value;
+      const quantity = document.getElementById("medicationQuantity").value;
+
+      try {
+        const response = await fetch("http://127.0.0.1:7005/api/pharmacist/inventory/", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, quantity }),
+        });
+        if (response.status === 401) {
+          alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("user");
+          window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+          return;
+        }
+        if (response.ok) {
+          document.getElementById("medicationName").value = "";
+          document.getElementById("medicationQuantity").value = "";
+          document.getElementById("addError").classList.add("hidden");
+          fetchMedications();
+        } else {
+          const data = await response.json();
+          document.getElementById("addError").textContent = data.error || "Thêm thuốc thất bại.";
+          document.getElementById("addError").classList.remove("hidden");
+        }
+      } catch (err) {
+        document.getElementById("addError").textContent = `Lỗi: ${err.message}`;
+        document.getElementById("addError").classList.remove("hidden");
+      }
+    });
+
+    // Cập nhật thuốc
+    async function updateMedication(id, currentQuantity) {
+      const newQuantity = prompt("Nhập số lượng mới:", currentQuantity);
+      if (newQuantity !== null && !isNaN(newQuantity) && newQuantity >= 0) {
+        try {
+          const response = await fetch(`http://127.0.0.1:7005/api/pharmacist/inventory/${id}/`, {
+            method: "PUT",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ quantity: parseInt(newQuantity) }),
+          });
+
+          console.log("Update response status:", response.status); // Gỡ lỗi: In trạng thái phản hồi
+          console.log("Update response headers:", response.headers.get("Content-Type")); // Gỡ lỗi: In loại nội dung
+
+          if (response.status === 401) {
+            alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("user");
+            window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+            return;
+          }
+
+          const contentType = response.headers.get("Content-Type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            if (response.ok) {
+              fetchMedications();
+            } else {
+              console.log("Update error response:", data); // Gỡ lỗi: In chi tiết lỗi
+              alert(`Cập nhật thất bại: ${data.error || "Lỗi không xác định"}`);
+            }
+          } else {
+            const text = await response.text();
+            console.log("Update response (non-JSON):", text); // Gỡ lỗi: In nội dung phản hồi
+            alert(`Cập nhật thất bại: Server trả về phản hồi không phải JSON`);
+          }
+        } catch (err) {
+          console.log("Update error:", err); // Gỡ lỗi: In lỗi chi tiết
+          alert(`Lỗi: ${err.message}`);
+        }
+      }
+    }
+
+    // Xóa thuốc
+    async function deleteMedication(id) {
+      if (confirm("Bạn có chắc muốn xóa thuốc này?")) {
+        try {
+          const response = await fetch(`http://127.0.0.1:7005/api/pharmacist/inventory/${id}/`, {
+            method: "DELETE",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          console.log("Delete response status:", response.status); // Gỡ lỗi: In trạng thái phản hồi
+          console.log("Delete response headers:", response.headers.get("Content-Type")); // Gỡ lỗi: In loại nội dung
+
+          if (response.status === 401) {
+            alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("user");
+            window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+            return;
+          }
+
+          const contentType = response.headers.get("Content-Type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            if (response.ok) {
+              fetchMedications();
+            } else {
+              console.log("Delete error response:", data); // Gỡ lỗi: In chi tiết lỗi
+              alert(`Xóa thất bại: ${data.error || "Lỗi không xác định"}`);
+            }
+          } else {
+            const text = await response.text();
+            console.log("Delete response (non-JSON):", text); // Gỡ lỗi: In nội dung phản hồi
+            alert(`Xóa thất bại: Server trả về phản hồi không phải JSON`);
+          }
+        } catch (err) {
+          console.log("Delete error:", err); // Gỡ lỗi: In lỗi chi tiết
+          alert(`Lỗi: ${err.message}`);
+        }
+      }
+    }
+
+    // Gọi hàm khi tải trang
+    fetchMedications();
+
+    // Xử lý nút đăng xuất
+    document.getElementById("logoutButton").addEventListener("click", function() {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+    });
+  </script>
+</body>
+</html>

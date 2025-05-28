@@ -17,28 +17,35 @@
           class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
           >📅 Lịch sử đặt lịch</a
         >
-        <!-- <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
-          >👨‍👩‍👧‍👦 Bệnh nhân</a
-        >
-        <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
-          >🧾 Chẩn đoán & kê đơn</a
-        >
-        <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
-          >🧪 Yêu cầu xét nghiệm</a
-        >
-        <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
-          >📄 Báo cáo</a
-        >
-        <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
-          >🧬 Kết quả xét nghiệm</a
-        >
-        <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
-          >💬 Giao tiếp</a
+        <!-- <a
+          href="/doctor/patients"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >👤 Bệnh nhân</a
         > -->
         <a
-          href="http://127.0.0.1:7003/api/patients/diagnosis_form_view/"
+          href="http://127.0.0.1:5500/backend/chatbot_tdque/index_improved.html"
           class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
           >📝 Chẩn đoán sức khỏe</a
+        >
+        <!-- <a
+          href="/doctor/lab-orders"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >🧬 Yêu cầu xét nghiệm</a
+        >
+        <a
+          href="/doctor/reports"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >📄 Báo cáo</a
+        >
+        <a
+          href="/doctor/results"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >🧪 Kết quả xét nghiệm</a
+        > -->
+        <a
+          href="http://127.0.0.1:5500/backend/chatbot_tdque/chat_interface.html"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >💬 Chatbot AI</a
         >
       </nav>
     </aside>
@@ -152,6 +159,10 @@
     </main>
 
     <script>
+      document.getElementById("user-info").addEventListener("click", () => {
+        window.location.href =
+          "http://127.0.0.1:7003/api/patients/update_view/";
+      });
       async function fetchData() {
         const username = localStorage.getItem("username") || "Tài khoản";
         document.getElementById("user-info").innerText = "🙎‍♂️ " + username;

@@ -21,7 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-10ijqpm3ohu7y^yv1h0%+&#w--%dl6cm7-%7^1h1_txvg%k!y8'
+# SECRET_KEY = 'django-insecure-10ijqpm3ohu7y^yv1h0%+&#w--%dl6cm7-%7^1h1_txvg%k!y8'
+SECRET_KEY = 'django-insecure-su3%4(&no)nw*bc159saa5hfv%9%iuyjrb+5qibl+-j&bb)t4f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'patient',
-    # 'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -133,13 +133,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
 REST_FRAMEWORK = {
     # 'DEFAULT_AUTHENTICATION_CLASSES': (
     #     'rest_framework_simplejwt.authentication.JWTAuthentication',
     # )
 }
-
-# CORS_ALLOWED_ORIGINS = [
-#     "http://127.0.0.1:7003",
-#     "http://localhost:7003",
-# ]

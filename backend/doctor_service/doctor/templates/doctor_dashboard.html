@@ -10,28 +10,65 @@
     <aside class="w-64 bg-[#4F6EF7] text-white flex flex-col p-5">
       <h2 class="text-xl font-bold mb-8 mt-4">🧑‍⚕️ Trang Chủ</h2>
       <nav class="space-y-3 text-md font-medium">
-        <a href="http://127.0.0.1:7002/api/doctor/appointment_view" class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2">📅 Quản lý lịch hẹn</a>
-        <a href="/doctor/patients" class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2">👤 Bệnh nhân</a>
-        <a href="/doctor/diagnosis" class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2">📝 Chẩn đoán & kê đơn</a>
-        <a href="/doctor/lab-orders" class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2">🧬 Yêu cầu xét nghiệm</a>
-        <a href="/doctor/reports" class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2">📄 Báo cáo</a>
-        <a href="/doctor/results" class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2">🧪 Kết quả xét nghiệm</a>
-        <a href="/doctor/messages" class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2">💬 Giao tiếp</a>
+        <a
+          href="http://127.0.0.1:7002/api/doctor/appointment_view"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >📅 Quản lý lịch hẹn</a
+        >
+        <a
+          href="http://127.0.0.1:7002/api/doctor/list_patient_view"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >👤 Bệnh nhân</a
+        >
+        <a
+          href="http://127.0.0.1:7002/api/doctor/diagonsis_view"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >📝 Chẩn đoán & kê đơn</a
+        >
+        <a
+          href="/doctor/lab-orders"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >🧬 Yêu cầu xét nghiệm</a
+        >
+        <a
+          href="/doctor/reports"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >📄 Báo cáo</a
+        >
+        <a
+          href="/doctor/results"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >🧪 Kết quả xét nghiệm</a
+        >
+        <a
+          href="/doctor/messages"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >💬 Giao tiếp</a
+        >
       </nav>
     </aside>
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col">
       <!-- Topbar -->
-      <header class="flex items-center justify-between px-6 py-4 bg-white border-b shadow-sm">
+      <header
+        class="flex items-center justify-between px-6 py-4 bg-white border-b shadow-sm"
+      >
         <input
           type="text"
           placeholder="🔍 Search..."
           class="border border-gray-300 rounded px-4 py-1 w-1/3 focus:outline-none focus:ring focus:border-blue-400"
         />
         <div class="flex items-center gap-4">
-          <span id="user-info" class="text-sm text-gray-700 font-medium">👤 Tài khoản</span>
-          <button onclick="handleLogout()" class="bg-[#4F6EF7] text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">📕 Đăng xuất</button>
+          <span id="user-info" class="text-sm text-gray-700 font-medium"
+            >👤 Tài khoản</span
+          >
+          <button
+            onclick="handleLogout()"
+            class="bg-[#4F6EF7] text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+          >
+            📕 Đăng xuất
+          </button>
         </div>
       </header>
 
@@ -39,17 +76,21 @@
       <main class="flex-1 bg-gray-50 p-10">
         <h1 class="text-2xl font-bold mb-4">📊 Bảng điều khiển</h1>
         <!-- Bạn có thể thêm biểu đồ, dữ liệu... -->
-        <div class="text-gray-500 italic">Chọn một mục ở thanh bên để bắt đầu.</div>
+        <div class="text-gray-500 italic">
+          Chọn một mục ở thanh bên để bắt đầu.
+        </div>
       </main>
     </div>
 
     <script>
       const token = new URLSearchParams(window.location.search).get("token");
-      const username = new URLSearchParams(window.location.search).get("username");
-        if (token) {
+      const username = new URLSearchParams(window.location.search).get(
+        "username"
+      );
+      if (token) {
         localStorage.setItem("accessToken", token);
         localStorage.setItem("username", username);
-        }
+      }
       document.getElementById("user-info").innerText = "👨‍⚕️ " + username;
 
       function handleLogout() {

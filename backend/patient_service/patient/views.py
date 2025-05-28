@@ -7,6 +7,7 @@ from bson import ObjectId
 from mongoengine.errors import DoesNotExist
 from django.shortcuts import render
 import requests
+import re
 
 USER_URL = "http://localhost:7000/api/auth/users"
 
@@ -66,7 +67,6 @@ class PatientUpdateView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class PatientListView(APIView):
     def get(self, request):
         try:
@@ -75,7 +75,7 @@ class PatientListView(APIView):
             for p in patients:
                 user_info = {}
                 try:
-                    res = requests.get(f"http://localhost:7000/api/auth/users/{p.user}/")
+                    res = requests.get(f"http://localhost:7000/api/auth/users/{p.user}")
                     if res.status_code == 200:
                         print(res)
                         user_info = res.json()
@@ -84,7 +84,7 @@ class PatientListView(APIView):
                     pass
 
                 data.append({
-                    "id": str(p.id),
+                    "id": str(p._id),
                     "user_id": p.user,
                     "username": user_info.get("username"),
                     "email": user_info.get("email"),
@@ -106,7 +106,7 @@ class PatientCreateView(APIView):
 class PatientInfoView(APIView):
     def get(self, request, id):
         try:
-            patient = Patient.objects(id=ObjectId(id)).first()
+            patient = Patient.objects(_id=ObjectId(id)).first()
             if not patient:
                 return Response({"error": "Patient not found"}, status=404)
             return Response({"user_id": patient.user})
@@ -146,5 +146,3 @@ def update_view(request):
 def appointment_view(request):
     return render(request, 'patientAppointment.html')
 
-def diagnosis_form_view(request):
-    return render(request, 'diagnosis/form.html')

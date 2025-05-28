@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Dược sĩ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <div class="bg-blue-800 text-white w-64 space-y-6 py-7 px-2">
+      <h2 class="text-2xl font-bold text-center">Dược sĩ</h2>
+      <nav>
+        <a href="{% url 'dashboard_view' %}" id="dashboardLink" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">Tổng quan</a>
+        <a href="{% url 'verify_view' %}" id="verifyLink" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">Xác minh đơn thuốc</a>
+        <a href="{% url 'inventory_view' %}" id="inventoryLink" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">Quản lý kho thuốc</a>
+      </nav>
+    </div>
+
+    <div class="flex-1 p-10">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Chào mừng, {{ user.username }}!</h1>
+        <button id="logoutButton" class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-200">
+          Đăng xuất
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-lg font-semibold text-gray-700">Tổng số đơn thuốc</h3>
+          <p class="text-3xl font-bold text-blue-600 mt-2">{{ total_prescriptions }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-lg font-semibold text-gray-700">Đơn chờ xác minh</h3>
+          <p class="text-3xl font-bold text-yellow-600 mt-2">{{ pending_prescriptions }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-lg font-semibold text-gray-700">Kho thuốc còn lại</h3>
+          <p class="text-3xl font-bold text-green-600 mt-2">{{ total_medications }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Lấy token từ query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
+
+    // Lấy token từ localStorage
+    let token = localStorage.getItem("accessToken");
+
+    // Nếu token từ query parameter tồn tại, lưu vào localStorage
+    if (tokenFromUrl) {
+      token = tokenFromUrl;
+      localStorage.setItem("accessToken", token);
+    }
+
+    // Cập nhật URL của tất cả liên kết với token
+    const links = document.querySelectorAll("nav a");
+    links.forEach(link => {
+      if (token) {
+        const url = new URL(link.href);
+        url.searchParams.set('token', token);
+        link.href = url.toString();
+      }
+    });
+
+    // Xử lý nút đăng xuất
+    document.getElementById("logoutButton").addEventListener("click", function() {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+    });
+  </script>
+</body>
+</html>

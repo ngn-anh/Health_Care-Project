@@ -12,6 +12,7 @@ class AppointmentSerializer(serializers.Serializer):
 
     def get_user_info(self, user_id):
         try:
+            print("api1: ", f"http://localhost:7000/api/auth/users/{user_id}/")
             res = requests.get(f"http://localhost:7000/api/auth/users/{user_id}/")
             if res.status_code == 200:
                 return res.json()
@@ -22,6 +23,7 @@ class AppointmentSerializer(serializers.Serializer):
     def get_doctor(self, obj):
         try:
             doctor_id = obj.doctor
+            print("api2: ", f"http://localhost:7002/api/doctor/info/{doctor_id}/")
             # Bước 1: Lấy user_id từ doctor_service
             res = requests.get(f"http://localhost:7002/api/doctor/info/{doctor_id}/")
             if res.status_code == 200:
@@ -34,6 +36,7 @@ class AppointmentSerializer(serializers.Serializer):
     def get_patient(self, obj):
         try:
             patient_id = obj.patient
+            print("api3: ", f"http://localhost:7003/api/patients/info/{patient_id}/")
             res = requests.get(f"http://localhost:7003/api/patients/info/{patient_id}/")
             if res.status_code == 200:
                 user_data = res.json()

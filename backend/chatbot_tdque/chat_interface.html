@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Bot Y Tế AI - Tư Vấn Sức Khỏe</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .chat-container {
+        width: 90%;
+        max-width: 800px;
+        height: 90vh;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .chat-header {
+        /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+        background: rgb(65, 65, 230);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        position: relative;
+      }
+
+      .chat-header h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .chat-header p {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .status-indicator {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 10px;
+        height: 10px;
+        background: #4caf50;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #f8f9fa;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .message.user {
+        justify-content: flex-end;
+      }
+
+      .message.bot {
+        justify-content: flex-start;
+      }
+
+      .message-content {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.4;
+        position: relative;
+      }
+
+      .message.user .message-content {
+        background: #007bff;
+        color: white;
+        border-bottom-right-radius: 5px;
+      }
+
+      .message.bot .message-content {
+        background: white;
+        color: #333;
+        border: 1px solid #e0e0e0;
+        border-bottom-left-radius: 5px;
+      }
+
+      .message-time {
+        font-size: 11px;
+        opacity: 0.6;
+        margin-top: 5px;
+      }
+
+      .typing-indicator {
+        display: none;
+        padding: 15px;
+        background: white;
+        border-radius: 18px;
+        margin-bottom: 15px;
+        max-width: 70%;
+        border: 1px solid #e0e0e0;
+      }
+
+      .typing-dots {
+        display: flex;
+        gap: 3px;
+      }
+
+      .typing-dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #999;
+        animation: typing 1.4s infinite;
+      }
+
+      .typing-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .typing-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typing {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+          opacity: 0.5;
+        }
+        30% {
+          transform: translateY(-10px);
+          opacity: 1;
+        }
+      }
+
+      .quick-symptoms {
+        padding: 15px 20px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        overflow-x: auto;
+      }
+
+      .quick-symptoms h4 {
+        margin-bottom: 10px;
+        color: #333;
+        font-size: 14px;
+      }
+
+      .symptom-chips {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+      }
+
+      .symptom-chip {
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        padding: 8px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+      }
+
+      .symptom-chip:hover {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+      }
+
+      .symptom-chip.selected {
+        background: #28a745;
+        color: white;
+        border-color: #28a745;
+      }
+
+      .chat-input {
+        padding: 20px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .input-container {
+        flex: 1;
+        position: relative;
+      }
+
+      #messageInput {
+        width: 100%;
+        padding: 12px 45px 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      #messageInput:focus {
+        border-color: #007bff;
+      }
+
+      .voice-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #999;
+        transition: color 0.2s;
+      }
+
+      .voice-btn:hover {
+        color: #007bff;
+      }
+
+      .voice-btn.recording {
+        color: #ff4444;
+        animation: pulse 1s infinite;
+      }
+
+      .send-btn {
+        background: #007bff;
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+
+      .send-btn:hover {
+        background: #0056b3;
+      }
+
+      .send-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .emergency-alert {
+        background: #ff4444;
+        color: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: bold;
+        animation: flashAlert 2s infinite;
+      }
+
+      @keyframes flashAlert {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .confidence-bar {
+        margin-top: 10px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 6px;
+      }
+
+      .confidence-fill {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          #ff4444 0%,
+          #ffaa00 50%,
+          #4caf50 100%
+        );
+        transition: width 0.3s ease;
+      }
+
+      @media (max-width: 768px) {
+        .chat-container {
+          width: 100%;
+          height: 100vh;
+          border-radius: 0;
+        }
+
+        .message-content {
+          max-width: 85%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="status-indicator"></div>
+        <h1>🤖 Chat Bot Y Tế AI</h1>
+        <p>Tư vấn sức khỏe thông minh - Hỗ trợ 24/7</p>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="message bot">
+          <div class="message-content">
+            <strong>🏥 Xin chào!</strong><br />
+            Tôi là Chat Bot Y Tế AI, chuyên tư vấn sức khỏe.<br /><br />
+            <strong>Bạn có thể:</strong><br />
+            • Mô tả triệu chứng của bạn<br />
+            • Chọn triệu chứng từ danh sách bên dưới<br />
+            • Sử dụng giọng nói để nói chuyện<br /><br />
+            <em>Hãy cho tôi biết bạn đang có triệu chứng gì nhé! 😊</em>
+            <div class="message-time">Bot • Bây giờ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+
+      <div class="quick-symptoms">
+        <h4>⚡ Triệu chứng phổ biến (có thể chọn nhiều):</h4>
+        <div class="symptom-chips" id="symptomChips">
+          <span class="symptom-chip" onclick="addSymptom('sốt')">🌡️ Sốt</span>
+          <span class="symptom-chip" onclick="addSymptom('ho')">😷 Ho</span>
+          <span class="symptom-chip" onclick="addSymptom('đau đầu')"
+            >🤕 Đau đầu</span
+          >
+          <span class="symptom-chip" onclick="addSymptom('mệt mỏi')"
+            >😴 Mệt mỏi</span
+          >
+          <span class="symptom-chip" onclick="addSymptom('đau họng')"
+            >😣 Đau họng</span
+          >
+          <span class="symptom-chip" onclick="addSymptom('chảy nước mũi')"
+            >👃 Chảy nước mũi</span
+          >
+          <span class="symptom-chip" onclick="addSymptom('buồn nôn')"
+            >🤢 Buồn nôn</span
+          >
+          <span class="symptom-chip" onclick="addSymptom('đau bụng')"
+            >🤰 Đau bụng</span
+          >
+          <span class="symptom-chip" onclick="addSymptom('khó thở')"
+            >😮‍💨 Khó thở</span
+          >
+          <span class="symptom-chip" onclick="addSymptom('mất vị giác')"
+            >👅 Mất vị giác</span
+          >
+        </div>
+        <div id="selectedSymptoms" style="margin-top: 10px; display: none">
+          <small style="color: #666"
+            >Đã chọn: <span id="symptomList"></span
+          ></small>
+          <button
+            onclick="clearSymptoms()"
+            style="
+              margin-left: 10px;
+              font-size: 11px;
+              padding: 2px 6px;
+              border: none;
+              background: #ff4444;
+              color: white;
+              border-radius: 3px;
+              cursor: pointer;
+            "
+          >
+            Xóa
+          </button>
+          <button
+            onclick="sendSelectedSymptoms()"
+            style="
+              margin-left: 5px;
+              font-size: 11px;
+              padding: 2px 6px;
+              border: none;
+              background: #007bff;
+              color: white;
+              border-radius: 3px;
+              cursor: pointer;
+            "
+          >
+            Gửi
+          </button>
+        </div>
+      </div>
+
+      <div class="chat-input">
+        <div class="input-container">
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Nhập triệu chứng của bạn..."
+            onkeypress="handleKeyPress(event)"
+          />
+          <button
+            class="voice-btn"
+            id="voiceBtn"
+            onclick="toggleVoiceInput()"
+            title="Nói chuyện"
+          >
+            🎤
+          </button>
+        </div>
+        <button
+          class="send-btn"
+          id="sendBtn"
+          onclick="sendMessage()"
+          title="Gửi"
+        >
+          <span style="color: white; font-size: 18px">➤</span>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let isListening = false;
+      let recognition = null;
+      let conversationHistory = [];
+      let selectedSymptoms = []; // Array to store selected symptoms
+
+      // Khởi tạo Web Speech API
+      if ("webkitSpeechRecognition" in window) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "vi-VN";
+
+        recognition.onresult = function (event) {
+          const transcript = event.results[0][0].transcript;
+          document.getElementById("messageInput").value = transcript;
+          stopVoiceInput();
+        };
+
+        recognition.onerror = function (event) {
+          console.error("Speech recognition error:", event.error);
+          stopVoiceInput();
+        };
+      }
+
+      // Text-to-Speech
+      function speakText(text) {
+        if ("speechSynthesis" in window) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "vi-VN";
+          utterance.rate = 0.9;
+          speechSynthesis.speak(utterance);
+        }
+      }
+
+      function toggleVoiceInput() {
+        if (!recognition) {
+          alert("Trình duyệt không hỗ trợ nhận dạng giọng nói");
+          return;
+        }
+
+        if (isListening) {
+          stopVoiceInput();
+        } else {
+          startVoiceInput();
+        }
+      }
+
+      function startVoiceInput() {
+        recognition.start();
+        isListening = true;
+        document.getElementById("voiceBtn").classList.add("recording");
+        document.getElementById("voiceBtn").innerHTML = "🔴";
+      }
+
+      function stopVoiceInput() {
+        if (recognition) {
+          recognition.stop();
+        }
+        isListening = false;
+        document.getElementById("voiceBtn").classList.remove("recording");
+        document.getElementById("voiceBtn").innerHTML = "🎤";
+      }
+
+      function addSymptom(symptom) {
+        const symptomsChips = document.querySelectorAll(".symptom-chip");
+        let clickedChip = null;
+
+        // Find the clicked chip
+        symptomsChips.forEach((chip) => {
+          if (chip.textContent.includes(symptom.split(" ")[0])) {
+            clickedChip = chip;
+          }
+        });
+
+        if (!selectedSymptoms.includes(symptom)) {
+          selectedSymptoms.push(symptom);
+          if (clickedChip) clickedChip.classList.add("selected");
+          updateSelectedSymptomsDisplay();
+
+          // Also add to input field
+          const currentInput = document.getElementById("messageInput").value;
+          if (currentInput) {
+            document.getElementById("messageInput").value =
+              currentInput + ", " + symptom;
+          } else {
+            document.getElementById("messageInput").value = symptom;
+          }
+        } else {
+          // Remove if already selected
+          selectedSymptoms = selectedSymptoms.filter((s) => s !== symptom);
+          if (clickedChip) clickedChip.classList.remove("selected");
+          updateSelectedSymptomsDisplay();
+
+          // Update input field
+          document.getElementById("messageInput").value =
+            selectedSymptoms.join(", ");
+        }
+      }
+
+      function updateSelectedSymptomsDisplay() {
+        const container = document.getElementById("selectedSymptoms");
+        const list = document.getElementById("symptomList");
+
+        if (selectedSymptoms.length > 0) {
+          container.style.display = "block";
+          list.textContent = selectedSymptoms.join(", ");
+        } else {
+          container.style.display = "none";
+        }
+      }
+
+      function clearSymptoms() {
+        selectedSymptoms = [];
+        updateSelectedSymptomsDisplay();
+        document.getElementById("messageInput").value = "";
+
+        // Remove selected class from all chips
+        document.querySelectorAll(".symptom-chip").forEach((chip) => {
+          chip.classList.remove("selected");
+        });
+      }
+
+      function sendSelectedSymptoms() {
+        if (selectedSymptoms.length > 0) {
+          document.getElementById("messageInput").value =
+            selectedSymptoms.join(", ");
+          sendMessage();
+          clearSymptoms();
+        }
+      }
+
+      function selectSymptom(symptom) {
+        document.getElementById("messageInput").value = symptom;
+        sendMessage();
+      }
+
+      function handleKeyPress(event) {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      }
+
+      function addMessage(content, isUser = false) {
+        const chatMessages = document.getElementById("chatMessages");
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${isUser ? "user" : "bot"}`;
+
+        const time = new Date().toLocaleTimeString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${content}
+                    <div class="message-time">${
+                      isUser ? "Bạn" : "Bot"
+                    } • ${time}</div>
+                </div>
+            `;
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function showTypingIndicator() {
+        document.getElementById("typingIndicator").style.display = "block";
+        const chatMessages = document.getElementById("chatMessages");
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function hideTypingIndicator() {
+        document.getElementById("typingIndicator").style.display = "none";
+      }
+
+      function formatBotResponse(data) {
+        let response = "";
+
+        if (data.emergency_alert) {
+          response += `<div class="emergency-alert">⚠️ CẢNH BÁO KHẨN CẤP ⚠️<br>${data.emergency_alert}</div>`;
+        }
+
+        if (data.input_symptoms && data.input_symptoms.length > 0) {
+          response += `<strong>🔍 Triệu chứng đã phân tích:</strong><br>`;
+          response += `📝 ${data.input_symptoms.join(", ")}<br><br>`;
+        }
+
+        if (data.predicted_disease) {
+          response += `<strong>🔍 Chẩn đoán dự kiến:</strong><br>`;
+          response += `📋 <strong>${data.predicted_disease}</strong><br>`;
+          response += `🎯 Độ tin cậy: ${Math.round(
+            data.confidence * 100
+          )}%<br>`;
+          response += `<div class="confidence-bar"><div class="confidence-fill" style="width: ${
+            data.confidence * 100
+          }%"></div></div><br>`;
+        }
+
+        if (data.description) {
+          response += `<strong>📖 Mô tả:</strong><br>${data.description}<br><br>`;
+        }
+
+        if (data.treatment) {
+          response += `<strong>💊 Điều trị:</strong><br>${data.treatment}<br><br>`;
+        }
+
+        if (data.when_to_see_doctor) {
+          response += `<strong>👨‍⚕️ Khi nào cần đến bác sĩ:</strong><br>${data.when_to_see_doctor}<br><br>`;
+        }
+
+        if (data.prevention) {
+          response += `<strong>🛡️ Phòng ngừa:</strong><br>${data.prevention}<br><br>`;
+        }
+
+        if (data.alternatives && data.alternatives.length > 0) {
+          response += `<strong>🔄 Các khả năng khác:</strong><br>`;
+          data.alternatives.slice(0, 3).forEach((alt, index) => {
+            response += `${index + 1}. ${alt.disease}: ${Math.round(
+              alt.probability * 100
+            )}%<br>`;
+          });
+          response += `<br>`;
+        }
+
+        if (data.uncertainty && data.uncertainty > 0.3) {
+          response += `<em>⚠️ Lưu ý: Kết quả có độ không chắc chắn cao (${Math.round(
+            data.uncertainty * 100
+          )}%). Nên tham khảo ý kiến bác sĩ.</em><br><br>`;
+        }
+
+        response += `<em>💡 Đây chỉ là tham khảo. Hãy tham khảo ý kiến bác sĩ để có chẩn đoán chính xác nhất!</em>`;
+
+        return response;
+      }
+
+      async function sendMessage() {
+        const messageInput = document.getElementById("messageInput");
+        const message = messageInput.value.trim();
+
+        if (!message) return;
+
+        // Hiển thị tin nhắn của user
+        addMessage(message, true);
+        conversationHistory.push({ user: message, timestamp: new Date() });
+
+        // Xóa input và hiển thị typing indicator
+        messageInput.value = "";
+        showTypingIndicator();
+
+        try {
+          // Gửi request đến API
+          const response = await fetch("http://localhost:8004/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              symptoms: [message],
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          // Ẩn typing indicator và hiển thị phản hồi
+          hideTypingIndicator();
+
+          const botResponse = formatBotResponse(data);
+          addMessage(botResponse);
+
+          // Text-to-speech cho phản hồi
+          const textForSpeech = data.predicted_disease
+            ? `Bạn có thể mắc ${
+                data.predicted_disease
+              } với độ tin cậy ${Math.round(data.confidence * 100)} phần trăm`
+            : "Tôi không thể xác định được bệnh cụ thể từ triệu chứng này";
+
+          speakText(textForSpeech);
+        } catch (error) {
+          hideTypingIndicator();
+          console.error("Error:", error);
+          addMessage(
+            "❌ Xin lỗi, có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại sau.<br><br><em>Hãy chắc chắn rằng server đang chạy tại http://localhost:8004</em>"
+          );
+        }
+      }
+
+      // Auto-focus vào input khi trang load
+      window.addEventListener("load", function () {
+        document.getElementById("messageInput").focus();
+      });
+
+      // Tự động cuộn xuống khi có tin nhắn mới
+      const chatMessages = document.getElementById("chatMessages");
+      const observer = new MutationObserver(function () {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      });
+      observer.observe(chatMessages, { childList: true });
+    </script>
+  </body>
+</html>

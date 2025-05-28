@@ -1,0 +1,296 @@
+{
+  "symptoms": {
+    "Fever": {
+      "name": "Fever",
+      "description": "Elevated body temperature above 37.5°C",
+      "severity_levels": [
+        "Low grade (37.5-38°C)",
+        "Moderate (38-39°C)",
+        "High (>39°C)"
+      ],
+      "common_causes": [
+        "Viral infections",
+        "Bacterial infections",
+        "Inflammatory conditions"
+      ]
+    },
+    "Cough": {
+      "name": "Cough",
+      "description": "Forceful expulsion of air from lungs",
+      "severity_levels": ["Dry cough", "Productive cough", "Persistent cough"],
+      "common_causes": ["Respiratory infections", "Allergies", "Asthma", "GERD"]
+    },
+    "Runny Nose": {
+      "name": "Runny Nose",
+      "description": "Excess nasal discharge",
+      "severity_levels": [
+        "Clear discharge",
+        "Thick discharge",
+        "Colored discharge"
+      ],
+      "common_causes": ["Viral infections", "Allergies", "Sinusitis"]
+    },
+    "Sneezing": {
+      "name": "Sneezing",
+      "description": "Involuntary expulsion of air through nose",
+      "severity_levels": ["Occasional", "Frequent", "Severe fits"],
+      "common_causes": ["Allergies", "Viral infections", "Irritants"]
+    },
+    "Sore Throat": {
+      "name": "Sore Throat",
+      "description": "Pain or irritation in the throat",
+      "severity_levels": ["Mild discomfort", "Moderate pain", "Severe pain"],
+      "common_causes": ["Viral infections", "Bacterial infections", "Allergies"]
+    },
+    "Fatigue": {
+      "name": "Fatigue",
+      "description": "Extreme tiredness or exhaustion",
+      "severity_levels": [
+        "Mild tiredness",
+        "Moderate fatigue",
+        "Severe exhaustion"
+      ],
+      "common_causes": ["Infections", "Sleep disorders", "Chronic conditions"]
+    },
+    "Headache": {
+      "name": "Headache",
+      "description": "Pain in the head or neck region",
+      "severity_levels": ["Mild", "Moderate", "Severe"],
+      "common_causes": ["Tension", "Migraine", "Sinusitis", "Dehydration"]
+    },
+    "Body Aches": {
+      "name": "Body Aches",
+      "description": "Muscle and joint pain throughout body",
+      "severity_levels": ["Mild aches", "Moderate pain", "Severe pain"],
+      "common_causes": [
+        "Viral infections",
+        "Overexertion",
+        "Inflammatory conditions"
+      ]
+    },
+    "Chills": {
+      "name": "Chills",
+      "description": "Feeling cold with shivering",
+      "severity_levels": ["Mild chills", "Moderate shivering", "Severe rigors"],
+      "common_causes": ["Fever", "Infections", "Hypothermia"]
+    },
+    "Loss of Taste": {
+      "name": "Loss of Taste",
+      "description": "Reduced or complete loss of taste sensation",
+      "severity_levels": ["Partial loss", "Complete loss", "Distorted taste"],
+      "common_causes": ["Viral infections", "Nasal congestion", "Medications"]
+    },
+    "Loss of Smell": {
+      "name": "Loss of Smell",
+      "description": "Reduced or complete loss of smell",
+      "severity_levels": ["Partial loss", "Complete loss", "Distorted smell"],
+      "common_causes": ["Viral infections", "Nasal congestion", "Sinusitis"]
+    },
+    "Shortness of Breath": {
+      "name": "Shortness of Breath",
+      "description": "Difficulty breathing or feeling breathless",
+      "severity_levels": ["Mild exertion", "Moderate activity", "At rest"],
+      "common_causes": ["Respiratory infections", "Asthma", "Heart conditions"]
+    },
+    "Chest Pain": {
+      "name": "Chest Pain",
+      "description": "Pain or discomfort in chest area",
+      "severity_levels": ["Mild discomfort", "Moderate pain", "Severe pain"],
+      "common_causes": [
+        "Respiratory infections",
+        "Muscle strain",
+        "Heart conditions"
+      ]
+    },
+    "Itchy Eyes": {
+      "name": "Itchy Eyes",
+      "description": "Irritation and urge to rub eyes",
+      "severity_levels": [
+        "Mild irritation",
+        "Moderate itching",
+        "Severe discomfort"
+      ],
+      "common_causes": ["Allergies", "Dry eyes", "Infections"]
+    },
+    "Watery Eyes": {
+      "name": "Watery Eyes",
+      "description": "Excessive tear production",
+      "severity_levels": [
+        "Mild tearing",
+        "Moderate watering",
+        "Severe tearing"
+      ],
+      "common_causes": ["Allergies", "Infections", "Irritants"]
+    },
+    "Nasal Congestion": {
+      "name": "Nasal Congestion",
+      "description": "Blocked or stuffy nose",
+      "severity_levels": [
+        "Mild stuffiness",
+        "Moderate blockage",
+        "Complete blockage"
+      ],
+      "common_causes": ["Infections", "Allergies", "Sinusitis"]
+    },
+    "Nausea": {
+      "name": "Nausea",
+      "description": "Feeling of sickness with urge to vomit",
+      "severity_levels": [
+        "Mild queasiness",
+        "Moderate nausea",
+        "Severe nausea"
+      ],
+      "common_causes": ["Infections", "Food poisoning", "Medications"]
+    },
+    "Vomiting": {
+      "name": "Vomiting",
+      "description": "Forceful emptying of stomach contents",
+      "severity_levels": ["Occasional", "Frequent", "Persistent"],
+      "common_causes": ["Infections", "Food poisoning", "Migraines"]
+    },
+    "Diarrhea": {
+      "name": "Diarrhea",
+      "description": "Loose or watery bowel movements",
+      "severity_levels": ["Mild", "Moderate", "Severe with dehydration"],
+      "common_causes": ["Infections", "Food poisoning", "Medications"]
+    },
+    "Abdominal Pain": {
+      "name": "Abdominal Pain",
+      "description": "Pain in the stomach or belly area",
+      "severity_levels": [
+        "Mild discomfort",
+        "Moderate pain",
+        "Severe cramping"
+      ],
+      "common_causes": ["Infections", "Food issues", "Inflammatory conditions"]
+    },
+    "Wheezing": {
+      "name": "Wheezing",
+      "description": "High-pitched whistling sound when breathing",
+      "severity_levels": ["Mild wheeze", "Audible wheeze", "Severe wheeze"],
+      "common_causes": ["Asthma", "Allergies", "Respiratory infections"]
+    },
+    "Chest Tightness": {
+      "name": "Chest Tightness",
+      "description": "Feeling of pressure or constriction in chest",
+      "severity_levels": [
+        "Mild tightness",
+        "Moderate pressure",
+        "Severe constriction"
+      ],
+      "common_causes": ["Asthma", "Anxiety", "Respiratory infections"]
+    },
+    "Facial Pain": {
+      "name": "Facial Pain",
+      "description": "Pain in face, particularly around sinuses",
+      "severity_levels": [
+        "Mild discomfort",
+        "Moderate pain",
+        "Severe pressure"
+      ],
+      "common_causes": ["Sinusitis", "Dental issues", "Nerve problems"]
+    },
+    "Thick Nasal Discharge": {
+      "name": "Thick Nasal Discharge",
+      "description": "Thick, colored mucus from nose",
+      "severity_levels": [
+        "Slight thickness",
+        "Moderately thick",
+        "Very thick/colored"
+      ],
+      "common_causes": [
+        "Bacterial infections",
+        "Sinusitis",
+        "Chronic conditions"
+      ]
+    },
+    "Light Sensitivity": {
+      "name": "Light Sensitivity",
+      "description": "Discomfort or pain from light exposure",
+      "severity_levels": [
+        "Mild sensitivity",
+        "Moderate discomfort",
+        "Severe photophobia"
+      ],
+      "common_causes": [
+        "Migraines",
+        "Eye infections",
+        "Neurological conditions"
+      ]
+    },
+    "Sound Sensitivity": {
+      "name": "Sound Sensitivity",
+      "description": "Discomfort from normal sound levels",
+      "severity_levels": [
+        "Mild sensitivity",
+        "Moderate discomfort",
+        "Severe phonophobia"
+      ],
+      "common_causes": [
+        "Migraines",
+        "Ear infections",
+        "Neurological conditions"
+      ]
+    },
+    "Mucus Production": {
+      "name": "Mucus Production",
+      "description": "Excessive production of respiratory mucus",
+      "severity_levels": [
+        "Small amounts",
+        "Moderate production",
+        "Excessive mucus"
+      ],
+      "common_causes": [
+        "Respiratory infections",
+        "Chronic bronchitis",
+        "Allergies"
+      ]
+    },
+    "Chest Discomfort": {
+      "name": "Chest Discomfort",
+      "description": "General uneasiness or mild pain in chest",
+      "severity_levels": [
+        "Mild discomfort",
+        "Moderate uneasiness",
+        "Significant discomfort"
+      ],
+      "common_causes": [
+        "Respiratory infections",
+        "Muscle strain",
+        "Acid reflux"
+      ]
+    },
+    "High Fever": {
+      "name": "High Fever",
+      "description": "Body temperature above 39°C (102.2°F)",
+      "severity_levels": ["39-40°C", "40-41°C", ">41°C (emergency)"],
+      "common_causes": ["Severe infections", "Pneumonia", "Sepsis"]
+    },
+    "Persistent Cough": {
+      "name": "Persistent Cough",
+      "description": "Cough lasting more than 3 weeks",
+      "severity_levels": ["3-8 weeks", "8+ weeks chronic", "Severe persistent"],
+      "common_causes": ["Post-viral", "Asthma", "Chronic conditions"]
+    },
+    "Mild Fatigue": {
+      "name": "Mild Fatigue",
+      "description": "Slight tiredness or reduced energy",
+      "severity_levels": [
+        "Minimal tiredness",
+        "Noticeable fatigue",
+        "Moderate tiredness"
+      ],
+      "common_causes": ["Minor infections", "Lack of sleep", "Stress"]
+    },
+    "Severe Headache": {
+      "name": "Severe Headache",
+      "description": "Intense pain in the head that interferes with daily activities",
+      "severity_levels": [
+        "Severe pain",
+        "Debilitating pain",
+        "Emergency level pain"
+      ],
+      "common_causes": ["Migraine", "Tension headache", "Secondary headaches"]
+    }
+  }
+}

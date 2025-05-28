@@ -93,7 +93,7 @@ class UserUpdateView(APIView):
         serializer = UserSerializer(updated_user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    
+   
 # View render giao diện HTML
 def login_view(request):
     return render(request, 'login.html')

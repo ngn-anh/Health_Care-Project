@@ -1,185 +1,261 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Lịch hẹn bác sĩ</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="flex min-h-screen bg-[#f9fafb]">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lịch hẹn bác sĩ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="flex min-h-screen bg-[#f9fafb]">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#4f67f9] text-white flex flex-col p-4 space-y-4">
+      <h1 class="text-xl font-bold flex items-center gap-2 mb-8 mt-4">
+        🧑‍⚕️ Trang Chủ
+      </h1>
+      <nav class="flex flex-col gap-4">
+        <a
+          class="bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2 font-semibold"
+          href="http://127.0.0.1:7002/api/doctor/appointment_view"
+          >📅 Quản lý lịch hẹn</a
+        >
+        <a
+          class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2"
+          href="http://127.0.0.1:7002/api/doctor/list_patient_view"
+          >👨‍👩‍👧‍👦 Bệnh nhân</a
+        >
+        <a
+          class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2"
+          href="http://127.0.0.1:7002/api/doctor/diagonsis_view"
+          >🧾 Chẩn đoán & kê đơn</a
+        >
+        <a
+          class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2"
+          href="#"
+          >🧪 Yêu cầu xét nghiệm</a
+        >
+        <a
+          class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2"
+          href="#"
+          >📄 Báo cáo</a
+        >
+        <a
+          class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2"
+          href="#"
+          >🧬 Kết quả xét nghiệm</a
+        >
+        <a
+          class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2"
+          href="#"
+          >💬 Giao tiếp</a
+        >
+      </nav>
+    </aside>
 
-  <!-- Sidebar -->
-  <aside class="w-64 bg-[#4f67f9] text-white flex flex-col p-4 space-y-4">
-    <h1 class="text-xl font-bold flex items-center gap-2 mb-8 mt-4">🧑‍⚕️ Trang Chủ</h1>
-    <nav class="flex flex-col gap-4">
-      <a class="bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2 font-semibold" href="#">📅 Quản lý lịch hẹn</a>
-      <a class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2" href="#">👨‍👩‍👧‍👦 Bệnh nhân</a>
-      <a class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2" href="#">🧾 Chẩn đoán & kê đơn</a>
-      <a class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2" href="#">🧪 Yêu cầu xét nghiệm</a>
-      <a class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2" href="#">📄 Báo cáo</a>
-      <a class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2" href="#">🧬 Kết quả xét nghiệm</a>
-      <a class="hover:bg-white/10 py-2 px-4 rounded text-md flex items-center gap-2" href="#">💬 Giao tiếp</a>
-    </nav>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="flex-1 p-6">
-   <!-- Topbar -->
-      <header class="flex items-center justify-between px-6 py-4 bg-white border-b shadow-sm">
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <!-- Topbar -->
+      <header
+        class="flex items-center justify-between px-6 py-4 bg-white border-b shadow-sm"
+      >
         <input
           type="text"
           placeholder="🔍 Search..."
           class="border border-gray-300 rounded px-4 py-1 w-1/3 focus:outline-none focus:ring focus:border-blue-400"
         />
         <div class="flex items-center gap-4">
-          <span id="user-info" class="text-sm text-gray-700 font-medium">👤 Tài khoản</span>
-          <button onclick="handleLogout()" class="bg-[#4F6EF7] text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">📕 Đăng xuất</button>
+          <span id="user-info" class="text-sm text-gray-700 font-medium"
+            >👤 Tài khoản</span
+          >
+          <button
+            onclick="handleLogout()"
+            class="bg-[#4F6EF7] text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+          >
+            📕 Đăng xuất
+          </button>
         </div>
       </header>
 
+      <!-- Title -->
+      <h2
+        class="text-xl font-bold text-[#3c5ec1] flex items-center gap-2 mb-4 mt-8"
+      >
+        📅 Danh sách lịch hẹn của tôi
+      </h2>
 
-    <!-- Title -->
-    <h2 class="text-xl font-bold text-[#3c5ec1] flex items-center gap-2 mb-4 mt-8">📅 Danh sách lịch hẹn của tôi</h2>
-
-    <!-- Form -->
-    <form id="appointmentForm" class="hidden bg-white p-4 rounded shadow grid grid-cols-1 md:grid-cols-6 gap-4 mb-6" onsubmit="handleSubmit(event)">
+      <!-- Form -->
+      <form
+        id="appointmentForm"
+        class="hidden bg-white p-4 rounded shadow grid grid-cols-1 md:grid-cols-6 gap-4 mb-6"
+        onsubmit="handleSubmit(event)"
+      >
         <select id="patient" class="border rounded p-2" required>
-            <option value="">-- Chọn bệnh nhân --</option>
+          <option value="">-- Chọn bệnh nhân --</option>
         </select>
-        <input id="datetime" type="datetime-local" class="border rounded p-2" required>
-        <input id="description" placeholder="Mô tả" class="border rounded p-2" required>
+        <input
+          id="datetime"
+          type="datetime-local"
+          class="border rounded p-2"
+          required
+        />
+        <input
+          id="description"
+          placeholder="Mô tả"
+          class="border rounded p-2"
+          required
+        />
         <select id="status" class="border rounded p-2">
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="cancelled">Cancelled</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="cancelled">Cancelled</option>
         </select>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white rounded px-4">Cập nhật</button>
-        <button type="button" onclick="cancelEdit()" class="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition">
+        <button
+          type="submit"
+          class="bg-blue-600 hover:bg-blue-700 text-white rounded px-4"
+        >
+          Cập nhật
+        </button>
+        <button
+          type="button"
+          onclick="cancelEdit()"
+          class="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
+        >
           Hủy
         </button>
-    </form>
+      </form>
 
-    <!-- Table -->
-    <div class="overflow-x-auto">
-      <table class="w-full bg-white rounded shadow text-sm">
-        <thead class="bg-gray-100 text-gray-700 font-semibold">
-          <tr>
-            <th class="px-4 py-2 text-left">Ngày giờ</th>
-            <th class="px-4 py-2 text-left">Bệnh nhân</th>
-            <th class="px-4 py-2 text-left">Mô tả</th>
-            <th class="px-4 py-2 text-left">Trạng thái</th>
-            <th class="px-4 py-2 text-left">Hành động</th>
-          </tr>
-        </thead>
-        <tbody id="appointmentList"></tbody>
-      </table>
-    </div>
-  </main>
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full bg-white rounded shadow text-sm">
+          <thead class="bg-gray-100 text-gray-700 font-semibold">
+            <tr>
+              <th class="px-4 py-2 text-left">Ngày giờ</th>
+              <th class="px-4 py-2 text-left">Bệnh nhân</th>
+              <th class="px-4 py-2 text-left">Mô tả</th>
+              <th class="px-4 py-2 text-left">Trạng thái</th>
+              <th class="px-4 py-2 text-left">Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="appointmentList"></tbody>
+        </table>
+      </div>
+    </main>
 
-  <script>
+    <script>
+      let editingId = null;
 
-    let editingId = null;
-
-    async function fetchData() {
-      const username = localStorage.getItem("username");
-      document.getElementById("user-info").innerText = "👨‍⚕️ " + username;
-      const token = localStorage.getItem("accessToken");
-      const [appointmentRes, patientRes] = await Promise.all([
-        fetch("/api/doctor/appointments/",  {
+      async function fetchData() {
+        const username = localStorage.getItem("username");
+        document.getElementById("user-info").innerText = "👨‍⚕️ " + username;
+        const token = localStorage.getItem("accessToken");
+        const [appointmentRes, patientRes] = await Promise.all([
+          fetch("/api/doctor/appointments/", {
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        }),
-        fetch("/api/doctor/patients/")
-      ]);
-      const appointments = await appointmentRes.json();
-      const patients = await patientRes.json();
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          fetch("/api/doctor/patients/"),
+        ]);
+        const appointments = await appointmentRes.json();
+        const patients = await patientRes.json();
 
-      const patientSelect = document.getElementById("patient");
-      patientSelect.innerHTML = `<option value="">-- Chọn bệnh nhân --</option>`;
-      patients.forEach(p => {
-        patientSelect.innerHTML += `<option value="${p.id}">${p.username}</option>`;
-      });
+        const patientSelect = document.getElementById("patient");
+        patientSelect.innerHTML = `<option value="">-- Chọn bệnh nhân --</option>`;
+        patients.forEach((p) => {
+          patientSelect.innerHTML += `<option value="${p.id}">${p.username}</option>`;
+        });
 
-      const list = document.getElementById("appointmentList");
-      list.innerHTML = "";
-      appointments.forEach(a => {
-        list.innerHTML += `
+        const list = document.getElementById("appointmentList");
+        list.innerHTML = "";
+        appointments.forEach((a) => {
+          list.innerHTML += `
           <tr class="border-t">
             <td class="px-4 py-2">${formatDateTimeVN(a.datetime)}</td>
             <td class="px-4 py-2">${a.patient?.username || a.patient}</td>
             <td class="px-4 py-2">${a.description}</td>
             <td class="px-4 py-2">${a.status}</td>
             <td class="px-4 py-2">
-              <button onclick='editAppointment(${JSON.stringify(a)})' class="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600">Sửa</button>
-              <button onclick='deleteAppointment("${a.id}")' class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Xóa</button>
+              <button onclick='editAppointment(${JSON.stringify(
+                a
+              )})' class="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600">Sửa</button>
+              <button onclick='deleteAppointment("${
+                a.id
+              }")' class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Xóa</button>
             </td>
           </tr>`;
-      });
-    }
+        });
+      }
 
-    function formatDateTimeVN(iso) {
-      const d = new Date(iso);
-      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")} ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-    }
+      function formatDateTimeVN(iso) {
+        const d = new Date(iso);
+        return `${String(d.getHours()).padStart(2, "0")}:${String(
+          d.getMinutes()
+        ).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")} ${String(
+          d.getDate()
+        ).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}/${d.getFullYear()}`;
+      }
 
-    async function handleSubmit(e) {
-      e.preventDefault();
-     
-      const data = {
-        patient: document.getElementById("patient").value,
-        datetime: document.getElementById("datetime").value,
-        description: document.getElementById("description").value,
-        status: document.getElementById("status").value
-      };
-      const url = editingId ? `/api/doctor/appointments/${editingId}/` : `/api/doctor/appointments/`;
-      const method = editingId ? "PUT" : "POST";
-      const token = localStorage.getItem("accessToken");
-      
-      document.getElementById("appointmentForm").classList.add("hidden");
+      async function handleSubmit(e) {
+        e.preventDefault();
 
-      await fetch(url, {
-        method,
-        headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-        body: JSON.stringify(data)
-      });
+        const data = {
+          patient: document.getElementById("patient").value,
+          datetime: document.getElementById("datetime").value,
+          description: document.getElementById("description").value,
+          status: document.getElementById("status").value,
+        };
+        const url = editingId
+          ? `/api/doctor/appointments/${editingId}/`
+          : `/api/doctor/appointments/`;
+        const method = editingId ? "PUT" : "POST";
+        const token = localStorage.getItem("accessToken");
 
-      document.getElementById("appointmentForm").reset();
-      editingId = null;
-      fetchData();
-    }
+        document.getElementById("appointmentForm").classList.add("hidden");
 
-    function editAppointment(appt) {
+        await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        });
+
+        document.getElementById("appointmentForm").reset();
+        editingId = null;
+        fetchData();
+      }
+
+      function editAppointment(appt) {
         editingId = appt.id;
         document.getElementById("appointmentForm").classList.remove("hidden");
-        document.getElementById("patient").value = appt.patient.id || appt.patient;
+        document.getElementById("patient").value =
+          appt.patient.id || appt.patient;
         document.getElementById("datetime").value = appt.datetime.slice(0, 16);
         document.getElementById("description").value = appt.description;
         document.getElementById("status").value = appt.status;
-    }
+      }
 
-    function cancelEdit() {
-       document.getElementById("appointmentForm").classList.add("hidden");
-    }
+      function cancelEdit() {
+        document.getElementById("appointmentForm").classList.add("hidden");
+      }
 
-    function handleLogout() {
+      function handleLogout() {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("username");
         window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
       }
 
-
-    async function deleteAppointment(id) {
-      if (confirm("Bạn có chắc muốn xóa lịch hẹn này không?")) {
-        await fetch(`/api/doctor/appointments/${id}/`, { method: "DELETE" });
-        fetchData();
+      async function deleteAppointment(id) {
+        if (confirm("Bạn có chắc muốn xóa lịch hẹn này không?")) {
+          await fetch(`/api/doctor/appointments/${id}/`, { method: "DELETE" });
+          fetchData();
+        }
       }
-    }
 
-    fetchData();
-  </script>
-</body>
+      fetchData();
+    </script>
+  </body>
 </html>

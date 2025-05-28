@@ -4,6 +4,9 @@ venv/
 
 # Byte-compiled / cache
 __pycache__/
+user/__pycache__/
+user/migrations/__pycache__/
+auth_service/__pycache__/
 *.py[cod]
 
 # # Environment variables

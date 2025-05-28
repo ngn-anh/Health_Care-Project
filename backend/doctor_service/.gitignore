@@ -4,6 +4,9 @@ venv/
 
 # Byte-compiled / cache
 __pycache__/
+doctor/__pycache__/
+doctor/migrations/__pycache__/
+doctor_service/__pycache__/
 *.py[cod]
 
 # # Environment variables

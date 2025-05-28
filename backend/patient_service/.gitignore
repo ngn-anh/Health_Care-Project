@@ -4,6 +4,9 @@ venv/
 
 # Byte-compiled / cache
 __pycache__/
+patient/__pycache__/
+patient/migrations/__pycache__/
+patient_service/__pycache__/
 *.py[cod]
 
 # # Environment variables

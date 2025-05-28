@@ -4,6 +4,9 @@ venv/
 
 # Byte-compiled / cache
 __pycache__/
+pharmacist/__pycache__/
+pharmacist/migrations/__pycache__/
+pharmacist_service/__pycache__/
 *.py[cod]
 
 # # Environment variables

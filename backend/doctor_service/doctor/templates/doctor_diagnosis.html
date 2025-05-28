@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chẩn đoán & Kê đơn</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <div class="w-64 bg-[#4F46E5] text-white min-h-screen">
+      <div class="p-6 text-xl font-semibold border-b border-blue-300">🧑‍⚕️ Trang Chủ</div>
+      <ul class="space-y-1 p-4 font-medium">
+        <li><a href="#" class="flex items-center gap-2 p-2 rounded hover:bg-blue-500">📅 Quản lý lịch hẹn</a></li>
+        <li><a href="#" class="flex items-center gap-2 p-2 rounded hover:bg-blue-500">🧑‍🤝‍🧑 Bệnh nhân</a></li>
+        <li><a href="#" class="flex items-center gap-2 p-2 rounded bg-blue-500">💊 Chẩn đoán & kê đơn</a></li>
+        <li><a href="#" class="flex items-center gap-2 p-2 rounded hover:bg-blue-500">🧪 Yêu cầu xét nghiệm</a></li>
+        <li><a href="#" class="flex items-center gap-2 p-2 rounded hover:bg-blue-500">📄 Báo cáo</a></li>
+        <li><a href="#" class="flex items-center gap-2 p-2 rounded hover:bg-blue-500">🔬 Kết quả xét nghiệm</a></li>
+        <li><a href="#" class="flex items-center gap-2 p-2 rounded hover:bg-blue-500">💬 Giao tiếp</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8">
+      <!-- Topbar -->
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-blue-700">💊 Chẩn đoán & Kê đơn bằng AI</h1>
+        <div class="flex items-center gap-4">
+          <span>🧑‍⚕️ longDoctor</span>
+          <button class="bg-red-500 text-white px-4 py-1 rounded">Đăng xuất</button>
+        </div>
+      </div>
+
+      <!-- Input form -->
+      <div class="bg-white shadow p-6 rounded mb-4">
+        <label class="block font-semibold mb-2 text-gray-700">Chọn bệnh nhân:</label>
+        <select id="patient-select" class="w-full border rounded px-4 py-2 mb-4">
+          <option disabled selected>Đang tải danh sách bệnh nhân...</option>
+        </select>
+
+        <label class="block font-semibold mb-2 text-gray-700">Triệu chứng của bệnh nhân:</label>
+        <textarea id="symptoms" rows="4" class="w-full border rounded px-4 py-2 mb-4" placeholder="Ví dụ: sốt, ho, mệt mỏi..."></textarea>
+        <button onclick="suggestDiagnosis()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">🔍 Gợi ý chẩn đoán</button>
+      </div>
+
+      <!-- Kết quả -->
+      <div id="suggestion" class="bg-white shadow p-6 rounded hidden">
+        <h2 class="text-lg font-semibold text-green-600 mb-2">✅ Gợi ý từ hệ thống:</h2>
+        <p><strong>Chẩn đoán:</strong> <span id="result-diagnosis" class="text-gray-800"></span></p>
+        <p><strong>Lời khuyên:</strong> <span id="result-prescription" class="text-gray-800"></span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("accessToken");
+
+  if (!token) {
+    alert("Bạn chưa đăng nhập hoặc thiếu token!");
+    return;
+  }
+
+  fetch("/api/doctor/my-patients/", {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    const select = document.getElementById("patient-select");
+    select.innerHTML = "";
+
+    if (Array.isArray(data) && data.length > 0) {
+      data.forEach(patient => {
+        const option = document.createElement("option");
+        option.value = patient.id;
+        option.textContent = `${patient.username} (${patient.email})`;
+        select.appendChild(option);
+      });
+    } else {
+      const opt = document.createElement("option");
+      opt.textContent = "Không có bệnh nhân nào";
+      opt.disabled = true;
+      select.appendChild(opt);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    const select = document.getElementById("patient-select");
+    select.innerHTML = "<option disabled>Lỗi tải danh sách</option>";
+  });
+});
+
+
+    function suggestDiagnosis() {
+    const rawSymptoms = document.getElementById("symptoms").value.trim();
+    const patientId = document.getElementById("patient-select").value;
+
+    if (!rawSymptoms) {
+      alert("Vui lòng nhập triệu chứng.");
+      return;
+    }
+
+    const symptomsList = rawSymptoms
+      .toLowerCase()
+      .split(",")
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    fetch("/api/doctor/diagnosis/ai/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        symptoms: symptomsList,
+        doctor_id: "longDoctor",
+        patient_id: patientId
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      const suggestionBox = document.getElementById("suggestion");
+      const diagnosisEl = document.getElementById("result-diagnosis");
+      const prescriptionEl = document.getElementById("result-prescription");
+
+      suggestionBox.classList.remove("hidden");
+
+      if (data.finished) {
+        const diagnosisText = data.message || "";
+        const diagnosis = diagnosisText.match(/Diagnosis: (.+?) \(/)?.[1] || "Không rõ";
+        const prescription = diagnosisText.match(/Advice: (.+)/)?.[1] || "Không có";
+
+        diagnosisEl.textContent = diagnosis;
+        prescriptionEl.textContent = prescription;
+      } else {
+        diagnosisEl.textContent = "⚠️ Chưa đủ thông tin để chẩn đoán.";
+        if (data.suggested_symptoms && data.suggested_symptoms.length > 0) {
+          prescriptionEl.innerHTML = "Bạn có gặp các triệu chứng sau không?<br><ul class='list-disc ml-6'>" +
+            data.suggested_symptoms.map(s => `<li>${s.replaceAll('_', ' ')}</li>`).join("") +
+            "</ul>";
+        } else {
+          prescriptionEl.textContent = "Không có triệu chứng nào để gợi ý thêm.";
+        }
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Có lỗi xảy ra khi gọi API.");
+    });
+  }
+
+  </script>
+
+</body>
+</html>

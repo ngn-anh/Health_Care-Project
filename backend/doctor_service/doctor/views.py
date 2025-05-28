@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -5,7 +6,10 @@ import requests
 import jwt
 from django.conf import settings
 from bson import ObjectId
-from doctor.models import Doctor
+from doctor.serializers import DiagnosisSerializer
+from doctor.models import Diagnosis, Doctor
+from rest_framework import status
+from .ml_model import diagnose_with_ai
 
 
 
@@ -212,7 +216,56 @@ class DoctorPatientListView(APIView):
             return Response({"error": str(e)}, status=500)
 
         
+class DiagnosisCreateView(APIView):
+    def post(self, request):
+        serializer = DiagnosisSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.validated_data
+            diag = Diagnosis(**data)
+            diag.save()
+            return Response(DiagnosisSerializer(diag).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class DiagnosisHistoryView(APIView):
+    def get(self, request, patient_id):
+        diagnoses = Diagnosis.objects(patient_id=patient_id)
+        data = [DiagnosisSerializer(d).data for d in diagnoses]
+        return Response(data)
+    
+
+        
+class AIDiagnosisInternalView(APIView):
+    def post(self, request):
+        try:
+            symptoms = request.data.get("symptoms", [])
+            doctor_id = request.data.get("doctor_id", "longDoctor")
+            patient_id = request.data.get("patient_id", "anonymous")
+
+            if not isinstance(symptoms, list):
+                return Response({"error": "Triệu chứng phải là danh sách."}, status=400)
+
+            result = diagnose_with_ai(symptoms)
+
+            # ✅ Nếu finished → lưu vào MongoDB
+            if result.get("finished"):
+                # Tách ra prediction và advice từ message
+                match_diagnosis = re.search(r"Diagnosis: ([\w\- ]+)", result["message"])
+                match_advice = re.search(r"Advice: (.+)", result["message"])
+                prediction = match_diagnosis.group(1) if match_diagnosis else "unknown"
+                advice = match_advice.group(1) if match_advice else "N/A"
+
+                Diagnosis.objects.create(
+                    doctor_id=doctor_id,
+                    patient_id=patient_id,
+                    symptoms=", ".join(symptoms),
+                    diagnosis=prediction,
+                    prescription=advice
+                )
+
+            return Response(result)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
     
 # View render giao diện HTML
 def dashboard_view(request):
@@ -223,3 +276,6 @@ def appointment_view(request):
 
 def list_patient_view(request):
     return render(request, 'doctor_list_patient.html')
+
+def diagonsis_view(request):
+    return render(request, 'doctor_diagnosis.html')

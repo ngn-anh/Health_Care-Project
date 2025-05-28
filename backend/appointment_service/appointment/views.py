@@ -5,6 +5,9 @@ from .models import Appointment
 from .serializers import AppointmentSerializer
 from bson import ObjectId
 import requests
+from mongoengine.errors import DoesNotExist
+import datetime
+import pytz
 
 DOCTOR_URL = "http://localhost:7002/api/doctor"
 PATIENT_URL = "http://localhost:7003/api/patients"
@@ -85,7 +88,7 @@ class AppointmentListView(APIView):
                 # 2.2 gọi API lấy chi tiết doctor
                 try:
                     dr_res = requests.get(f"{DOCTOR_URL}/getInforById/{doctor_id}")
-                    print("dr_res: ", dr_res.status_code)
+
                     if dr_res.status_code == 200:
                         appt_dict["doctor"] = dr_res.json()
                     else:
@@ -111,4 +114,65 @@ class AppointmentListView(APIView):
             return Response({"error": "Không tìm thấy lịch hẹn"}, status=404)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
-    
+
+class AppointmentUpdateView(APIView):
+    def post(self, request, id):
+        try:
+            appointment = Appointment.objects(id=ObjectId(id)).first()
+            new_status = request.data.get('status')
+            
+            if new_status is None:
+                return Response({'error': 'Thiếu trường status'}, status=400)
+
+            # Cập nhật và lưu
+            appointment.status = new_status
+            appointment.save()
+            appointment.reload() 
+
+            # Serialize và trả về dữ liệu sau cập nhật
+            serializer = AppointmentSerializer(appointment)
+            return Response(serializer.data, status=200)
+        except DoesNotExist:
+            return Response({"error": "Không tìm thấy"}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
+class AppointmentCreateView(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            patient = data.get("patient")
+            doctor = data.get("doctor")
+            description = data.get("description")
+            datetime_str = data.get("datetime")
+            status = data.get("status")
+
+            # Kiểm tra dữ liệu đầu vào
+            if not all([patient, doctor, description, datetime_str, status]):
+                return Response({"error": "Thiếu thông tin"}, status=400)
+
+            # Chuyển đổi datetime string sang đối tượng datetime
+            try:
+                dt = datetime.datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
+                
+            except Exception:
+                return Response({"error": "Datetime không hợp lệ"}, status=400)
+
+            # Tạo và lưu appointment bằng mongoengine
+            appointment = Appointment(
+                patient=patient,
+                doctor=doctor,
+                description=description,
+                datetime=dt,
+                status=status
+            )
+            appointment.save()
+
+            return Response({
+                "message": "Đặt lịch thành công",
+                "appointment_id": str(appointment.id)
+            }, status=200)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+

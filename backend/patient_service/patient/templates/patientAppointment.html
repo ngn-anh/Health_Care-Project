@@ -17,7 +17,7 @@
           class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
           >📅 Lịch sử đặt lịch</a
         >
-        <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
+        <!-- <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
           >👨‍👩‍👧‍👦 Bệnh nhân</a
         >
         <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
@@ -34,6 +34,11 @@
         >
         <a class="hover:bg-white/10 py-2 px-4 rounded text-md" href="#"
           >💬 Giao tiếp</a
+        > -->
+        <a
+          href="http://127.0.0.1:7003/api/patients/diagnosis_form_view/"
+          class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
+          >📝 Chẩn đoán sức khỏe</a
         >
       </nav>
     </aside>
@@ -63,12 +68,72 @@
       </header>
 
       <!-- Title -->
-      <h2
-        class="text-xl font-bold text-[#3c5ec1] flex items-center gap-2 mb-4 mt-8"
-      >
-        📅 Danh sách lịch hẹn của tôi
-      </h2>
+      <div class="flex items-center justify-between mb-4 mt-8">
+        <h2 class="text-xl font-bold text-[#3c5ec1] flex items-center gap-2">
+          📅 Danh sách lịch hẹn của tôi
+        </h2>
+        <button
+          onclick="openModal()"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          ➕ Đặt lịch
+        </button>
+      </div>
 
+      <!-- Modal -->
+      <div
+        id="appointmentModal"
+        class="fixed inset-0 bg-black bg-opacity-30 hidden flex justify-center items-center z-50"
+      >
+        <div class="bg-white p-6 rounded shadow w-[400px] relative">
+          <h3 class="text-lg font-bold mb-4 text-blue-600">
+            📅 Tạo lịch hẹn mới
+          </h3>
+
+          <label class="block mb-2 text-sm font-medium">👨‍⚕️ Chọn bác sĩ</label>
+          <select
+            id="doctorSelect"
+            class="w-full mb-4 border px-3 py-2 rounded text-sm"
+          ></select>
+
+          <label class="block mb-2 text-sm font-medium">📝 Mô tả</label>
+          <input
+            id="descriptionInput"
+            class="w-full mb-4 border px-3 py-2 rounded text-sm"
+            type="text"
+            placeholder="Nhập mô tả..."
+          />
+
+          <label class="block mb-2 text-sm font-medium">📆 Ngày</label>
+          <input
+            id="dateInput"
+            type="date"
+            class="w-full mb-4 border px-3 py-2 rounded text-sm"
+          />
+
+          <label class="block mb-2 text-sm font-medium">⏰ Giờ</label>
+          <input
+            id="timeInput"
+            type="time"
+            class="w-full mb-4 border px-3 py-2 rounded text-sm"
+          />
+
+          <div class="flex justify-end gap-2 mt-4">
+            <button
+              onclick="closeModal()"
+              class="px-4 py-2 text-sm bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Hủy
+            </button>
+            <button
+              onclick="createAppointment()"
+              class="px-4 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              ✅ Xác nhận
+            </button>
+          </div>
+        </div>
+      </div>
       <!-- Table -->
       <div class="overflow-x-auto">
         <table class="w-full bg-white rounded shadow text-sm">
@@ -104,15 +169,10 @@
         if (!patient._id) return;
 
         try {
-          console.log(
-            "api url: ",
-            `http://127.0.0.1:7001/api/appointments/getAllList?patient=${patient._id}`
-          );
           const appointmentRes = await fetch(
             `http://127.0.0.1:7001/api/appointments/getAllList?patient=${patient._id}`,
             {
               method: "GET",
-              // Không cần headers gì cho GET không có body
             }
           );
 
@@ -124,32 +184,32 @@
 
           appointments.forEach((a) => {
             const isPending = a.status === "pending";
+            console.log("debug", a._id);
             list.innerHTML += `
-              <tr class="border-t">
-                <td class="px-4 py-2">${formatDateTimeVN(a.datetime)}</td>
-                <td class="px-4 py-2">${
-                  a.doctor?.user?.fullname || "Bác sĩ"
-                }</td>
-                <td class="px-4 py-2">${a.description}</td>
-                <td class="px-4 py-2">${a.status}</td>
-                <td class="px-4 py-2">
-                  <button
-                    ${
-                      isPending
-                        ? `onclick='deleteAppointment("${a._id}")'`
-                        : "disabled"
-                    }
-                    class="${
-                      isPending
-                        ? "bg-red-500 hover:bg-red-600"
-                        : "bg-gray-400 cursor-not-allowed"
-                    } text-white px-2 py-1 rounded"
-                  >
-                    Hủy
-                  </button>
-                </td>
-              </tr>
-            `;
+            <tr class="border-t">
+              <td class="px-4 py-2">${formatDateTimeVN(a.datetime)}</td>
+              <td class="px-4 py-2">${a.doctor?.user?.fullname || "Bác sĩ"}</td>
+              <td class="px-4 py-2">${a.description}</td>
+              <td id="status-${a._id}" class="px-4 py-2">${a.status}</td>
+              <td class="px-4 py-2">
+                <button
+                  id="btn-cancel-${a._id}"
+                  ${
+                    isPending
+                      ? `onclick='deleteAppointment("${a._id}")'`
+                      : "disabled"
+                  }
+                  class="${
+                    isPending
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-gray-400 cursor-not-allowed"
+                  } text-white px-2 py-1 rounded"
+                >
+                  Hủy
+                </button>
+              </td>
+            </tr>
+          `;
           });
         } catch (error) {
           console.log("Lỗi khi gọi API lịch hẹn:", error);
@@ -174,19 +234,37 @@
         if (!confirmDel) return;
 
         try {
+          // console.log("debuggg: ", id);
           const res = await fetch(
-            `http://localhost:7001/api/appointments/${id}`,
+            `http://127.0.0.1:7001/api/appointments/updateStatus/${id}`,
             {
-              method: "DELETE",
+              method: "POST",
               headers: {
-                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                // Authorization: `Bearer ${token}`,
               },
+              body: JSON.stringify({ status: "cancelled" }),
             }
           );
-
+          // console.log("res", res.status);
           if (res.ok) {
+            // await fetchData();
             alert("Đã hủy lịch hẹn.");
-            fetchData();
+
+            // 1. Cập nhật trạng thái hiển thị
+            const statusTd = document.getElementById(`status-${id}`);
+            if (statusTd) {
+              statusTd.innerText = "cancelled";
+            }
+
+            // 2. Vô hiệu hóa nút "Hủy"
+            const btn = document.getElementById(`btn-cancel-${id}`);
+            if (btn) {
+              btn.disabled = true;
+              btn.classList.remove("bg-red-500", "hover:bg-red-600");
+              btn.classList.add("bg-gray-400", "cursor-not-allowed");
+              btn.onclick = null; // Không còn click được
+            }
           } else {
             alert("Không thể hủy lịch hẹn.");
           }
@@ -200,6 +278,88 @@
         localStorage.removeItem("username");
         localStorage.removeItem("patient");
         window.location.href = "http://localhost:7000/api/auth/login_view/";
+      }
+
+      function openModal() {
+        document.getElementById("appointmentModal").classList.remove("hidden");
+        fetchDoctors();
+      }
+
+      function closeModal() {
+        document.getElementById("appointmentModal").classList.add("hidden");
+      }
+
+      async function fetchDoctors() {
+        const select = document.getElementById("doctorSelect");
+        select.innerHTML = "<option>Đang tải...</option>";
+        try {
+          const res = await fetch(
+            "http://127.0.0.1:7002/api/doctor/getAllList/"
+          );
+          const doctors = await res.json();
+          select.innerHTML = "";
+          doctors.forEach((doc) => {
+            const opt = document.createElement("option");
+            opt.value = doc._id;
+            opt.textContent = doc.user?.fullname || "Không tên";
+            select.appendChild(opt);
+          });
+        } catch (error) {
+          select.innerHTML = "<option>Lỗi tải danh sách bác sĩ</option>";
+        }
+      }
+
+      async function createAppointment() {
+        const doctorId = document.getElementById("doctorSelect").value;
+        const description = document.getElementById("descriptionInput").value;
+        const date = document.getElementById("dateInput").value;
+        const time = document.getElementById("timeInput").value;
+        const patientStr = localStorage.getItem("patient");
+        if (!doctorId || !description || !date || !time || !patientStr) {
+          alert("Vui lòng nhập đầy đủ thông tin.");
+          return;
+        }
+
+        const patient = JSON.parse(patientStr);
+        // Tạo Date gốc (mặc định theo local time)
+        const localDate = new Date(`${date}T${time}:00`);
+
+        // Cộng thêm 7 tiếng (7 * 60 * 60 * 1000 ms)
+        const utcPlus7 = new Date(localDate.getTime() + 7 * 60 * 60 * 1000);
+
+        // Tạo ISO string (giờ sau khi cộng 7 tiếng sẽ hiển thị đúng với backend xử lý UTC)
+        const datetime = utcPlus7.toISOString();
+        // const datetime = new Date(`${date}T${time}:00+07:00`).toISOString();
+        try {
+          console.log("data: ", patient._id, doctorId, description, datetime);
+          const res = await fetch(
+            "http://127.0.0.1:7001/api/appointments/create",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                patient: patient._id,
+                doctor: doctorId,
+                description: description,
+                datetime: datetime,
+                status: "pending",
+              }),
+            }
+          );
+
+          if (res.ok) {
+            alert("Đặt lịch thành công!");
+            closeModal();
+            fetchData();
+          } else {
+            alert("Không thể tạo lịch hẹn.");
+          }
+        } catch (error) {
+          console.error("Lỗi tạo lịch hẹn:", error);
+          alert("Lỗi khi gửi yêu cầu.");
+        }
       }
 
       window.onload = fetchData;

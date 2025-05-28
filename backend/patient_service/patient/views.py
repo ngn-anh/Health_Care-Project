@@ -145,3 +145,6 @@ def update_view(request):
 
 def appointment_view(request):
     return render(request, 'patientAppointment.html')
+
+def diagnosis_form_view(request):
+    return render(request, 'diagnosis/form.html')

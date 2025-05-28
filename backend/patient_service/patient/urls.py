@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     PatientView, home_view, PatientInforView, update_view, 
     PatientUpdateView, PatientCreateView, PatientInfoView, 
-    PatientListView, PatientInforByIdView, appointment_view
+    PatientListView, PatientInforByIdView, appointment_view,
+    diagnosis_form_view
 )
 
 urlpatterns = [
@@ -17,4 +18,5 @@ urlpatterns = [
     path("home_view/", home_view, name="home_view"),
     path("update_view/", update_view, name="update_view"),
     path("appointment_view/", appointment_view, name="appointment_view"),
+    path("diagnosis_form_view/", diagnosis_form_view, name="diagnosis_form_view"),
 ]

@@ -15,17 +15,17 @@
           class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
           >📅 Lịch sử đặt lịch</a
         >
-        <a
+        <!-- <a
           href="/doctor/patients"
           class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
           >👤 Bệnh nhân</a
-        >
+        > -->
         <a
-          href="/doctor/diagnosis"
+          href="http://127.0.0.1:7003/api/patients/diagnosis_form_view/"
           class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
-          >📝 Chẩn đoán & kê đơn</a
+          >📝 Chẩn đoán sức khỏe</a
         >
-        <a
+        <!-- <a
           href="/doctor/lab-orders"
           class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
           >🧬 Yêu cầu xét nghiệm</a
@@ -44,7 +44,7 @@
           href="/doctor/messages"
           class="flex items-center gap-2 hover:bg-white/10 rounded px-3 py-2"
           >💬 Giao tiếp</a
-        >
+        > -->
       </nav>
     </aside>
 
@@ -131,6 +131,7 @@
         localStorage.removeItem("accessToken");
         localStorage.removeItem("userId");
         localStorage.removeItem("username");
+        localStorage.removeItem("patient");
         window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
       }
 

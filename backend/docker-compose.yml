@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  appointment_service:
+    build: ./appointment_service
+    ports:
+      - "7001:7001"
+    networks:
+      - micro_net
+  auth_service:
+    build: ./auth_service
+    ports:
+      - "7000:7000"
+    networks:
+      - micro_net
+  doctor_service:
+    build: ./doctor_service
+    ports:
+      - "7002:7002"
+    networks:
+      - micro_net
+  patient_service:
+    build: ./patient_service
+    ports:
+      - "7003:7003"
+    networks:
+      - micro_net
+
+networks:
+  micro_net:

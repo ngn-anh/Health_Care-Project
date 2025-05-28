@@ -79,3 +79,40 @@ body, html {
   margin-top: 1rem;
   font-size: 0.9rem;
 }
+
+/* UserManagement.css */
+.user-mgmt-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.user-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.user-form input,
+.user-form select,
+.user-form button {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.user-table th {
+  background: #f0f0f0;
+}

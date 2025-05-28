@@ -9,29 +9,51 @@ const LoginForm: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-  try {
-    const res = await axios.post("http://localhost:8000/api/auth/login/", {
-      username,
-      password,
-    });
+    try {
+      // Lấy JWT token
+      const res = await axios.post("http://localhost:8000/api/token/", {
+        username,
+        password,
+      });
+      localStorage.setItem("accessToken", res.data.access);
 
-    localStorage.setItem("accessToken", res.data.access);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
+      // Lấy thông tin user
+      const userRes = await axios.get("http://localhost:8000/api/me/", {
+        headers: {
+          Authorization: `Bearer ${res.data.access}`,
+        },
+      });
+      localStorage.setItem("user", JSON.stringify(userRes.data));
 
-    alert("Đăng nhập thành công!");
+      alert("Đăng nhập thành công!");
 
-    // Điều hướng theo role
-    const role = res.data.user.role;
-    if (role === "doctor") {
-      window.location.href = "/doctor";
-    } else if (role === "patient") {
-      window.location.href = "/patient";
-    } else {
-      window.location.href = "/";
+      // Sau khi đăng nhập thành công và đã có user info:
+      const user = userRes.data;
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // // Gọi API tạo profile (chỉ cần gọi, backend sẽ tự kiểm tra tồn tại)
+      // if (user.role === "patient") {
+      //   fetch("http://localhost:8002/api/patient/create-profile/", {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({ user_id: user.id }),
+      //   });
+      // }
+
+      // Điều hướng theo role
+      const role = userRes.data.role;
+      if (role === "doctor") {
+        window.location.href = "/doctor";
+      } else if (role === "patient") {
+        window.location.href = "/patient";
+      } else if (role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/";
+      }
+    } catch {
+      alert("Đăng nhập thất bại!");
     }
-  } catch {
-    alert("Đăng nhập thất bại!");
-  }
   };
 
   return (

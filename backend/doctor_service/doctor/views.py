@@ -238,7 +238,7 @@ class AIDiagnosisInternalView(APIView):
     def post(self, request):
         try:
             symptoms = request.data.get("symptoms", [])
-            doctor_id = request.data.get("doctor_id", "longDoctor")
+            doctor_id = "683465854805a69e6decafb0"
             patient_id = request.data.get("patient_id", "anonymous")
 
             if not isinstance(symptoms, list):

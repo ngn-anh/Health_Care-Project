@@ -57,32 +57,44 @@
   <!-- JS -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-    fetch("/api/doctor/my-patients/")
-      .then(res => res.json())
-      .then(data => {
-        const select = document.getElementById("patient-select");
-        select.innerHTML = ""; // Xoá loading option
+  const token = localStorage.getItem("accessToken");
 
-        if (Array.isArray(data) && data.length > 0) {
-          data.forEach(patient => {
-            const option = document.createElement("option");
-            option.value = patient.id;
-            option.textContent = `${patient.username} (${patient.email})`;
-            select.appendChild(option);
-          });
-        } else {
-          const opt = document.createElement("option");
-          opt.textContent = "Không có bệnh nhân nào";
-          opt.disabled = true;
-          select.appendChild(opt);
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        const select = document.getElementById("patient-select");
-        select.innerHTML = "<option disabled>Lỗi tải danh sách</option>";
+  if (!token) {
+    alert("Bạn chưa đăng nhập hoặc thiếu token!");
+    return;
+  }
+
+  fetch("/api/doctor/my-patients/", {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    const select = document.getElementById("patient-select");
+    select.innerHTML = "";
+
+    if (Array.isArray(data) && data.length > 0) {
+      data.forEach(patient => {
+        const option = document.createElement("option");
+        option.value = patient.id;
+        option.textContent = `${patient.username} (${patient.email})`;
+        select.appendChild(option);
       });
+    } else {
+      const opt = document.createElement("option");
+      opt.textContent = "Không có bệnh nhân nào";
+      opt.disabled = true;
+      select.appendChild(opt);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    const select = document.getElementById("patient-select");
+    select.innerHTML = "<option disabled>Lỗi tải danh sách</option>";
   });
+});
+
 
     function suggestDiagnosis() {
     const rawSymptoms = document.getElementById("symptoms").value.trim();

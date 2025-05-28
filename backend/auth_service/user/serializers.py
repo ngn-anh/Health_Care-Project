@@ -30,12 +30,11 @@ class RegisterSerializer(serializers.Serializer):
 
         try:
             if validated_data['role'] == 'doctor':
-                # Gọi sang doctor_service
                 requests.post("http://localhost:7002/api/doctor/create/", json={"user_id": str(user.id)})
             elif validated_data['role'] == 'patient':
-                # Gọi sang patient_service
                 requests.post("http://localhost:7003/api/patients/create/", json={"user_id": str(user.id)})
+            elif validated_data['role'] == 'pharmacist':
+                requests.post("http://localhost:7005/api/pharmacist/create/", json={"user_id": str(user.id)})
         except Exception as e:
             print("❌ Failed to notify related service:", e)
-
         return user

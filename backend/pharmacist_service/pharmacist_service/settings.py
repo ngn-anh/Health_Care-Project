@@ -27,7 +27,13 @@ SECRET_KEY = 'django-insecure-*@v!shnot6zkr6l)^5wnouxx&wl2f@@pe&v0ce$hyasal&b(=g
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+from mongoengine import connect
+connect(
+    db="SAD",  # tên database MongoDB
+    host="mongodb+srv://loan:21112003loanhoang@cluster0.1sdjxcz.mongodb.net/SAD?retryWrites=true&w=majority&appName=Cluster0",
+    username="loan",
+    password="21112003loanhoang",
+)
 
 # Application definition
 

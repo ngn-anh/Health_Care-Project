@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác minh đơn thuốc</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <div class="bg-blue-800 text-white w-64 space-y-6 py-7 px-2">
+      <h2 class="text-2xl font-bold text-center">Dược sĩ</h2>
+      <nav>
+        <a href="{% url 'dashboard_view' %}?token={{ token }}" id="dashboardLink" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">Tổng quan</a>
+        <a href="{% url 'verify_view' %}?token={{ token }}" id="verifyLink" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">Xác minh đơn thuốc</a>
+        <a href="{% url 'inventory_view' %}?token={{ token }}" id="inventoryLink" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">Quản lý kho thuốc</a>
+      </nav>
+    </div>
+
+    <div class="flex-1 p-10">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Xác minh đơn thuốc</h1>
+        <button id="logoutButton" class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-200">
+          Đăng xuất
+        </button>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Danh sách chẩn đoán</h3>
+        <table id="diagnosisTable" class="w-full text-left">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="p-2">Chẩn đoán</th>
+              <th class="p-2">Thuốc gợi ý</th>
+              <th class="p-2">Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="diagnosisList">
+            {% for diag in diagnoses %}
+              <tr>
+                <td class="p-2">{{ diag.diagnosis }}</td>
+                <td class="p-2">{{ diag.suggested_medications|join:", " }}</td>
+                <td class="p-2">
+                  <button data-diagnosis-id="{{ diag.id|escapejs }}" data-suggested-meds="{{ diag.suggested_medications|join:', '|escapejs }}" class="bg-green-600 text-white py-1 px-2 rounded hover:bg-green-700 verify-button">Xác minh</button>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3" class="p-2 text-center">Không có chẩn đoán nào.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <p id="verifyError" class="text-red-500 text-sm mt-2 hidden"></p>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Lịch sử xác minh</h3>
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="p-2">Chẩn đoán</th>
+              <th class="p-2">Thuốc đã cấp</th>
+              <th class="p-2">Thời gian xác minh</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in verification_history %}
+              <tr>
+                <td class="p-2">{{ entry.diagnosis }}</td>
+                <td class="p-2">{{ entry.dispensed_medications|join:", " }}</td>
+                <td class="p-2">{{ entry.verified_at }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3" class="p-2 text-center">Chưa có lịch sử xác minh.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal chọn thuốc -->
+  <div id="verifyModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+      <h3 class="text-lg font-semibold mb-4">Chọn thuốc để cấp</h3>
+      <form id="verifyForm">
+        <input type="hidden" id="diagnosisId">
+        <div id="medicationList" class="mb-4">
+          <!-- Danh sách thuốc sẽ được thêm bằng JavaScript -->
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" onclick="closeVerifyModal()" class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Hủy</button>
+          <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Xác nhận</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Lấy token từ URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
+    let token = localStorage.getItem("accessToken");
+    if (tokenFromUrl) {
+      token = tokenFromUrl;
+      localStorage.setItem("accessToken", token);
+    }
+
+    if (!token) {
+      alert("Không tìm thấy token. Vui lòng đăng nhập lại.");
+      window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+    }  // Xóa 'return' ở đây vì không cần thiết
+
+    // Cập nhật URL của tất cả liên kết với token
+    function updateLinks() {
+      const links = document.querySelectorAll("nav a");
+      links.forEach(link => {
+        if (token) {
+          const url = new URL(link.href);
+          url.searchParams.set('token', token);
+          link.href = url.toString();
+        } else {
+          window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateLinks);
+    } else {
+      updateLinks();
+    }
+
+    // Phân tích JSON từ context
+    let availableMedications;
+    try {
+      console.log('Raw medication list:', '{{ medication_list|safe }}');
+      availableMedications = JSON.parse('{{ medication_list|safe }}');
+    } catch (err) {
+      console.error('Error parsing medication_list:', err);
+      availableMedications = [];
+    }
+
+    // Mở modal chọn thuốc
+    function openVerifyModal(diagnosisId, suggestedMeds) {
+      console.log('Opening modal for diagnosisId:', diagnosisId, 'suggestedMeds:', suggestedMeds);
+      document.getElementById('diagnosisId').value = diagnosisId;
+      const modal = document.getElementById('verifyModal');
+      const medicationList = document.getElementById('medicationList');
+      medicationList.innerHTML = '';
+
+      // Lấy danh sách thuốc gợi ý
+      const suggestedMedArray = suggestedMeds.split(", ").map(med => med.replace(" (A)", ""));
+
+      // Hiển thị các thuốc có sẵn trong kho (có nhãn (A))
+      availableMedications.forEach(med => {
+        if (suggestedMedArray.some(suggested => suggested.toLowerCase() === med.name.toLowerCase()) && med.quantity > 0) {
+          const div = document.createElement('div');
+          div.className = 'flex items-center mb-2';
+          div.innerHTML = `
+            <input type="checkbox" name="medications" value="${med.name}" class="mr-2">
+            <label>${med.name} (A) - Còn ${med.quantity} viên</label>
+            <input type="number" min="1" max="${med.quantity}" value="1" class="ml-2 w-16 border rounded p-1 quantity-input" disabled>
+          `;
+          medicationList.appendChild(div);
+
+          // Kích hoạt input số lượng khi checkbox được chọn
+          div.querySelector('input[type="checkbox"]').addEventListener('change', function() {
+            div.querySelector('.quantity-input').disabled = !this.checked;
+          });
+        } else {
+          console.log(`Medication ${med.name} not included, quantity: ${med.quantity}`);
+        }
+      });
+
+      if (medicationList.children.length === 0) {
+        medicationList.innerHTML = '<p class="text-red-500">Không có thuốc nào trong kho để cấp.</p>';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    // Gắn sự kiện cho các nút "Xác minh"
+    document.querySelectorAll('.verify-button').forEach(button => {
+      button.addEventListener('click', function() {
+        const diagnosisId = this.getAttribute('data-diagnosis-id');
+        const suggestedMeds = this.getAttribute('data-suggested-meds');
+        openVerifyModal(diagnosisId, suggestedMeds);
+      });
+    });
+
+    // Đóng modal
+    function closeVerifyModal() {
+      console.log('Closing modal');
+      document.getElementById('verifyModal').classList.add('hidden');
+      document.getElementById('verifyForm').reset();
+    }
+
+    // Xử lý form xác minh
+    document.getElementById('verifyForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const diagnosisId = document.getElementById('diagnosisId').value;
+      const selectedMedications = [];
+      const checkboxes = document.querySelectorAll('input[name="medications"]:checked');
+      console.log('Selected checkboxes:', checkboxes);
+
+      checkboxes.forEach(checkbox => {
+        const quantityInput = checkbox.parentElement.querySelector('.quantity-input');
+        selectedMedications.push({
+          name: checkbox.value,
+          quantity: parseInt(quantityInput.value)
+        });
+      });
+
+      if (selectedMedications.length === 0) {
+        alert('Vui lòng chọn ít nhất một loại thuốc.');
+        return;
+      }
+
+      try {
+        console.log('Sending request with data:', { diagnosis_id: diagnosisId, medications: selectedMedications });
+        const response = await fetch("http://127.0.0.1:7005/api/pharmacist/dispense/", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            diagnosis_id: diagnosisId,
+            medications: selectedMedications
+          }),
+        });
+
+        if (response.status === 401) {
+          alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("user");
+          window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+          return;
+        }
+
+        const data = await response.json();
+        console.log('API response:', data);
+        if (response.ok) {
+          alert("Đơn thuốc đã được xác minh và cấp thuốc thành công!");
+          closeVerifyModal();
+          window.location.reload();
+        } else {
+          document.getElementById("verifyError").textContent = data.error || "Xác minh thất bại.";
+          document.getElementById("verifyError").classList.remove("hidden");
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        document.getElementById("verifyError").textContent = `Lỗi: ${err.message}`;
+        document.getElementById("verifyError").classList.remove("hidden");
+      }
+    });
+
+    // Xử lý nút đăng xuất
+    document.getElementById('logoutButton').addEventListener('click', function() {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      window.location.href = "http://127.0.0.1:7000/api/auth/login_view/";
+    });
+  </script>
+</body>
+</html>
